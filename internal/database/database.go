@@ -26,8 +26,11 @@ type Service interface {
 	Close() error
 
 	// ListAuthors returns a list of authors from the database.
-	ListAuthors() ([]models.Author, error)
-	CreateAuthor(author models.Author) error
+	Create(entity any) error
+	Read(entity any, id uint) error
+	Update(entity any) error
+	Delete(entity any, id uint) error
+	List(entity any, limit int, offset int) ([]any, error)
 }
 
 type service struct {
@@ -52,7 +55,7 @@ func New() Service {
 		log.Fatal(err)
 	}
 
-	// AutoMigrate the Author struct to create the authors table if it doesn't exist
+	// AutoMigrate the models to create the table if it doesn't exist
 	err = db.AutoMigrate(&models.Author{})
 	if err != nil {
 		log.Fatal(err)
@@ -137,21 +140,63 @@ func (s *service) Close() error {
 	return sqlDB.Close()
 }
 
-func (s *service) ListAuthors() ([]models.Author, error) {
-	var authors []models.Author
-	result := s.db.Find(&authors)
-	if result.Error != nil {
-		return nil, result.Error
+func (s *service) Create(entity any) error {
+	if !s.db.Migrator().HasTable(entity) {
+		return fmt.Errorf("a table for %v does not exist", entity)
 	}
 
-	return authors, nil
-}
-
-func (s *service) CreateAuthor(author models.Author) error {
-	result := s.db.Create(&author)
+	result := s.db.Create(entity)
 	if result.Error != nil {
 		return result.Error
 	}
-
 	return nil
+}
+
+func (s *service) Read(entity any, id uint) error {
+	if !s.db.Migrator().HasTable(entity) {
+		return fmt.Errorf("a table for %v does not exist", entity)
+	}
+
+	result := s.db.First(entity, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (s *service) Update(entity any) error {
+	if !s.db.Migrator().HasTable(entity) {
+		return fmt.Errorf("a table for %v does not exist", entity)
+	}
+
+	result := s.db.Save(entity)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (s *service) Delete(entity any, id uint) error {
+	if !s.db.Migrator().HasTable(entity) {
+		return fmt.Errorf("a table for %v does not exist", entity)
+	}
+
+	result := s.db.Delete(entity, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (s *service) List(entity any, limit int, offset int) ([]any, error) {
+	if !s.db.Migrator().HasTable(entity) {
+		return nil, fmt.Errorf("a table for %v does not exist", entity)
+	}
+
+	var entities []any
+	result := s.db.Model(entity).Limit(limit).Offset(offset).Find(&entities)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return entities, nil
 }

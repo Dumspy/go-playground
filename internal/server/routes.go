@@ -40,7 +40,7 @@ func (s *Server) healthHandler(c *gin.Context) {
 }
 
 func (s *Server) listAuthorsHandler(c *gin.Context) {
-	authors, err := s.db.ListAuthors()
+	authors, err := s.db.List(models.Author{}, 0, 0)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -56,7 +56,7 @@ func (s *Server) createAuthorHandler(c *gin.Context) {
 		return
 	}
 
-	if err := s.db.CreateAuthor(author); err != nil {
+	if err := s.db.Create(author); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
