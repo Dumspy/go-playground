@@ -1,6 +1,7 @@
 package server
 
 import (
+	"my_project/internal/database/models"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -21,6 +22,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.GET("/health", s.healthHandler)
 
+	r.GET("/authors", s.listAuthorsHandler)
+	r.POST("/authors", s.createAuthorHandler)
+
 	return r
 }
 
@@ -33,4 +37,29 @@ func (s *Server) HelloWorldHandler(c *gin.Context) {
 
 func (s *Server) healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.db.Health())
+}
+
+func (s *Server) listAuthorsHandler(c *gin.Context) {
+	authors, err := s.db.ListAuthors()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, authors)
+}
+
+func (s *Server) createAuthorHandler(c *gin.Context) {
+	var author models.Author
+	if err := c.ShouldBindJSON(&author); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := s.db.CreateAuthor(author); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, author)
 }

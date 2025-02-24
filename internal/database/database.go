@@ -2,15 +2,17 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"time"
 
+	"my_project/internal/database/models"
+
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 // Service represents a service that interacts with a database.
@@ -22,10 +24,14 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	// ListAuthors returns a list of authors from the database.
+	ListAuthors() ([]models.Author, error)
+	CreateAuthor(author models.Author) error
 }
 
 type service struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
 var (
@@ -39,10 +45,16 @@ func New() Service {
 		return dbInstance
 	}
 
-	db, err := sql.Open("sqlite3", dburl)
+	db, err := gorm.Open(sqlite.Open(dburl), &gorm.Config{})
 	if err != nil {
 		// This will not be a connection error, but a DSN parse error or
 		// another initialization error.
+		log.Fatal(err)
+	}
+
+	// AutoMigrate the Author struct to create the authors table if it doesn't exist
+	err = db.AutoMigrate(&models.Author{})
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -60,8 +72,16 @@ func (s *service) Health() map[string]string {
 
 	stats := make(map[string]string)
 
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		stats["status"] = "down"
+		stats["error"] = fmt.Sprintf("db down: %v", err)
+		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		return stats
+	}
+
 	// Ping the database
-	err := s.db.PingContext(ctx)
+	err = sqlDB.PingContext(ctx)
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
@@ -74,7 +94,7 @@ func (s *service) Health() map[string]string {
 	stats["message"] = "It's healthy"
 
 	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	dbStats := sqlDB.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -108,6 +128,30 @@ func (s *service) Health() map[string]string {
 // If the connection is successfully closed, it returns nil.
 // If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+
 	log.Printf("Disconnected from database: %s", dburl)
-	return s.db.Close()
+	return sqlDB.Close()
+}
+
+func (s *service) ListAuthors() ([]models.Author, error) {
+	var authors []models.Author
+	result := s.db.Find(&authors)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return authors, nil
+}
+
+func (s *service) CreateAuthor(author models.Author) error {
+	result := s.db.Create(&author)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
