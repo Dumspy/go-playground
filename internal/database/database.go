@@ -56,7 +56,7 @@ func New() Service {
 	}
 
 	// AutoMigrate the models to create the table if it doesn't exist
-	err = db.AutoMigrate(&models.Author{})
+	err = db.AutoMigrate(&models.Author{}, &models.Artist{}, &models.Book{}, &models.Cover{})
 	if err != nil {
 		log.Fatal(err)
 	}
