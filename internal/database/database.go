@@ -30,7 +30,7 @@ type Service interface {
 	Read(entity any, id uint) error
 	Update(entity any) error
 	Delete(entity any, id uint) error
-	List(entity any, limit int, offset int) ([]any, error)
+	List(entities any, limit int, offset int) error
 }
 
 type service struct {
@@ -188,15 +188,15 @@ func (s *service) Delete(entity any, id uint) error {
 	return nil
 }
 
-func (s *service) List(entity any, limit int, offset int) ([]any, error) {
-	if !s.db.Migrator().HasTable(entity) {
-		return nil, fmt.Errorf("a table for %v does not exist", entity)
+func (s *service) List(entities any, limit int, offset int) error {
+	if !s.db.Migrator().HasTable(entities) {
+		return fmt.Errorf("a table for %v does not exist", entities)
 	}
 
-	var entities []any
-	result := s.db.Model(entity).Limit(limit).Offset(offset).Find(&entities)
+	result := s.db.Limit(limit).Offset(offset).Find(entities)
 	if result.Error != nil {
-		return nil, result.Error
+		return result.Error
 	}
-	return entities, nil
+
+	return nil
 }

@@ -38,6 +38,12 @@ importers:
       lucide-react:
         specifier: ^0.476.0
         version: 0.476.0(react@19.0.0)
+      openapi-fetch:
+        specifier: ^0.13.4
+        version: 0.13.4
+      openapi-react-query:
+        specifier: ^0.3.0
+        version: 0.3.0(@tanstack/react-query@5.66.9(react@19.0.0))(openapi-fetch@0.13.4)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -1736,6 +1742,18 @@ packages:
   object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
     engines: {node: '>= 6'}
+
+  openapi-fetch@0.13.4:
+    resolution: {integrity: sha512-JHX7UYjLEiHuQGCPxa3CCCIqe/nc4bTIF9c4UYVC8BegAbWoS3g4gJxKX5XcG7UtYQs2060kY6DH64KkvNZahg==}
+
+  openapi-react-query@0.3.0:
+    resolution: {integrity: sha512-xYCaE4yqTsgu4HfpcjMMXxNgfiQWE/dWtSIr9t1RhL70PZsretPHw0qqnmWL4X2Vk6BcsL4LSFkwQTr8OM9aGw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.25.0
+      openapi-fetch: ^0.13.4
+
+  openapi-typescript-helpers@0.0.15:
+    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
 
   openapi-typescript@7.6.1:
     resolution: {integrity: sha512-F7RXEeo/heF3O9lOXo2bNjCOtfp7u+D6W3a3VNEH2xE6v+fxLtn5nq0uvUcA1F5aT+CMhNeC5Uqtg5tlXFX/ag==}
@@ -3712,6 +3730,18 @@ snapshots:
   object-assign@4.1.1: {}
 
   object-hash@3.0.0: {}
+
+  openapi-fetch@0.13.4:
+    dependencies:
+      openapi-typescript-helpers: 0.0.15
+
+  openapi-react-query@0.3.0(@tanstack/react-query@5.66.9(react@19.0.0))(openapi-fetch@0.13.4):
+    dependencies:
+      '@tanstack/react-query': 5.66.9(react@19.0.0)
+      openapi-fetch: 0.13.4
+      openapi-typescript-helpers: 0.0.15
+
+  openapi-typescript-helpers@0.0.15: {}
 
   openapi-typescript@7.6.1(typescript@5.7.3):
     dependencies:

@@ -1,5 +1,10 @@
 package main
 
+// @title Go Playground API
+// @version 1
+// @description This is a sample server Go Playground server.
+// @servers.url /api/v1
+
 import (
 	"context"
 	"fmt"

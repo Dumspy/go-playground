@@ -1,11 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import AuthorCard from '@/components/author-card'
+import { useApi } from '@/context/api'
 
 export const Route = createFileRoute('/authors/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const {api} = useApi()
+
+  const apiAuthors = api.useQuery('get', '/authors')
+
   const authors = [
     { id: '1', name: 'Author 1' },
     { id: '2', name: 'Author 2' },

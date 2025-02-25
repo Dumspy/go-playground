@@ -4,6 +4,7 @@ import (
 	"go-playground/internal/database/models"
 	"go-playground/openapi"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,10 +24,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	api := r.Group("/api/v1")
 	{
-		api.Group("/authors")
+		api.GET("/health", s.healthHandler)
+		authors := api.Group("/authors")
 		{
-			api.GET("/", s.listAuthorsHandler)
-			api.POST("/", s.createAuthorHandler)
+			authors.GET("/", s.listAuthorsHandler)
+			authors.POST("/", s.createAuthorHandler)
+			authors.GET("/:id", s.getAuthorHandler)
 		}
 	}
 
@@ -48,8 +51,8 @@ func (s *Server) healthHandler(c *gin.Context) {
 // @Failure 500 {string} string
 // @Router /authors [get]
 func (s *Server) listAuthorsHandler(c *gin.Context) {
-	authors, err := s.db.List(models.Author{}, 0, 0)
-	if err != nil {
+	var authors []models.Author
+	if err := s.db.List(&authors, 10, 0); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -75,10 +78,42 @@ func (s *Server) createAuthorHandler(c *gin.Context) {
 		return
 	}
 
-	if err := s.db.Create(author); err != nil {
+	if err := s.db.Create(&author); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, author)
+}
+
+// Authors
+// @Summary Get author
+// @Description Get author by ID
+// @Tags authors
+// @Produce json
+// @Param id path int true "Author ID"
+// @Success 200 {object} models.Author
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /authors/{id} [get]
+func (s *Server) getAuthorHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	var author models.Author
+	if err := s.db.Read(&author, uint(id64)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if author.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, author)
 }
