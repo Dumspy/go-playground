@@ -2,15 +2,11 @@ package server
 
 import (
 	"go-playground/internal/database/models"
+	"go-playground/openapi"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-
-	docs "go-playground/docs"
-
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -25,7 +21,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.GET("/health", s.healthHandler)
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := r.Group("/api/v1")
 	{
 		api.Group("/authors")
@@ -35,7 +30,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		}
 	}
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	openapi.RegisterOpenApiRoute(r)
 
 	return r
 }

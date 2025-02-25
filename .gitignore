@@ -37,3 +37,6 @@ main
 
 # test.db
 test.db
+
+#openapi
+openapi/swagger.json
