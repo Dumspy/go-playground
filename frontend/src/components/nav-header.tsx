@@ -8,6 +8,10 @@ const items = {
     title: 'Home',
     href: '/',
   },
+  authors: {
+    title: 'Authors',
+    href: '/authors',
+  },
   about: {
     title: 'About',
     href: '/about',

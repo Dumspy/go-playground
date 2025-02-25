@@ -13,6 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthorsIndexImport } from './routes/authors/index'
+import { Route as AuthorsAuthorIdImport } from './routes/authors/$authorId'
 
 // Create/Update Routes
 
@@ -25,6 +27,18 @@ const AboutRoute = AboutImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthorsIndexRoute = AuthorsIndexImport.update({
+  id: '/authors/',
+  path: '/authors/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthorsAuthorIdRoute = AuthorsAuthorIdImport.update({
+  id: '/authors/$authorId',
+  path: '/authors/$authorId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +60,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/authors/$authorId': {
+      id: '/authors/$authorId'
+      path: '/authors/$authorId'
+      fullPath: '/authors/$authorId'
+      preLoaderRoute: typeof AuthorsAuthorIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/authors/': {
+      id: '/authors/'
+      path: '/authors'
+      fullPath: '/authors'
+      preLoaderRoute: typeof AuthorsIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +82,46 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/authors/$authorId': typeof AuthorsAuthorIdRoute
+  '/authors': typeof AuthorsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/authors/$authorId': typeof AuthorsAuthorIdRoute
+  '/authors': typeof AuthorsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/authors/$authorId': typeof AuthorsAuthorIdRoute
+  '/authors/': typeof AuthorsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/about' | '/authors/$authorId' | '/authors'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/about' | '/authors/$authorId' | '/authors'
+  id: '__root__' | '/' | '/about' | '/authors/$authorId' | '/authors/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AuthorsAuthorIdRoute: typeof AuthorsAuthorIdRoute
+  AuthorsIndexRoute: typeof AuthorsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AuthorsAuthorIdRoute: AuthorsAuthorIdRoute,
+  AuthorsIndexRoute: AuthorsIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +135,9 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/about",
+        "/authors/$authorId",
+        "/authors/"
       ]
     },
     "/": {
@@ -105,6 +145,12 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/authors/$authorId": {
+      "filePath": "authors/$authorId.tsx"
+    },
+    "/authors/": {
+      "filePath": "authors/index.tsx"
     }
   }
 }

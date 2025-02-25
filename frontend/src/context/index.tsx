@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import React from "react"
 
 interface IGlobalContentProps {
-  children: React.JSX.Element | React.JSX.Element[]
+  children: React.ReactNode
 }
 
 const queryClient = new QueryClient()
