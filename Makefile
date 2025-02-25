@@ -6,7 +6,6 @@ all: build test
 build:
 	@echo "Building..."
 	
-	
 	@go build -o main cmd/api/main.go
 
 # Run the application
@@ -18,11 +17,13 @@ run:
 # Test the application
 test:
 	@echo "Testing..."
+
 	@go test ./... -v
 
 # Clean the binary
 clean:
 	@echo "Cleaning..."
+
 	@rm -f main
 
 # Live Reload
@@ -41,5 +42,13 @@ watch:
                 exit 1; \
             fi; \
         fi
+
+#Swagger
+swagger:
+	@echo "Generating Swagger..."
+
+	@rm -rf ./docs
+
+	@swag init -g cmd/api/main.go --pd
 
 .PHONY: all build run test clean watch

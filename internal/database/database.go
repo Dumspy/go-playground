@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"my_project/internal/database/models"
+	"go-playground/internal/database/models"
 
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/sqlite"

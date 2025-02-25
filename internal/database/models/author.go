@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Author represents an author in the database.
 type Author struct {
 	gorm.Model
 	FirstName string `json:"firstname" binding:"required"`
