@@ -16,9 +16,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Add your frontend URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "Origin"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true, // Enable cookies/auth
 	}))
+
+	// r.Use(cors.Default())
 
 	r.GET("/health", s.healthHandler)
 
@@ -27,8 +30,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		api.GET("/health", s.healthHandler)
 		authors := api.Group("/authors")
 		{
-			authors.GET("/", s.listAuthorsHandler)
-			authors.POST("/", s.createAuthorHandler)
+			authors.GET("", s.listAuthorsHandler)
+			authors.POST("", s.createAuthorHandler)
 			authors.GET("/:id", s.getAuthorHandler)
 		}
 	}
@@ -42,22 +45,55 @@ func (s *Server) healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.db.Health())
 }
 
+// AuthorResponse is the response struct for the listAuthorsHandler
+type ListAuthorResponse struct {
+	ID        uint   `json:"id"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+}
+
 // Authors
 // @Summary List authors
 // @Description List all authors
 // @Tags authors
 // @Produce json
-// @Success 200 {array} models.Author
+// @Param limit query int false "Limit"
+// @Param offset query int false "Offset"
+// @Success 200 {array} ListAuthorResponse
 // @Failure 500 {string} string
 // @Router /authors [get]
 func (s *Server) listAuthorsHandler(c *gin.Context) {
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit format"})
+		return
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset format"})
+		return
+	}
+
 	var authors []models.Author
-	if err := s.db.List(&authors, 10, 0); err != nil {
+	if err := s.db.List(&authors, limit, offset); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, authors)
+	var response []ListAuthorResponse
+	for _, author := range authors {
+		response = append(response, ListAuthorResponse{
+			ID:        author.ID,
+			FirstName: author.FirstName,
+			LastName:  author.LastName,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // Authors

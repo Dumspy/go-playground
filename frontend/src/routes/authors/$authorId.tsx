@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useApi } from '@/context/api'
 
 export const Route = createFileRoute('/authors/$authorId')({
   component: AuthorComponent,
@@ -10,16 +10,18 @@ export const Route = createFileRoute('/authors/$authorId')({
 
 function AuthorComponent() {
   const { authorId } = Route.useParams()
-  
-  const { data: author, isLoading } = useQuery({
-    queryKey: ['author', authorId],
-    queryFn: async () => {
-      const response = await fetch(`/api/authors/${authorId}`)
-      if (!response.ok) throw new Error('Failed to fetch author')
-      return response.json()
-    }
+  const { api } = useApi()
+
+  const { data: author, isLoading, error } = api.useQuery('get', '/authors/{id}', {
+    params: {
+      path: { id: Number(authorId)},
+    },
   })
 
+  const fullName = [author?.firstname, author?.lastname]
+  .filter(Boolean)
+  .join(' ') || "Unknown Author";
+  
   if (isLoading) {
     return (
       <div className="p-4">
@@ -36,15 +38,47 @@ function AuthorComponent() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="p-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-red-500">Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Failed to load author information. Please try again later.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Handle case where author data is undefined or null
+  if (!author) {
+    return (
+      <div className="p-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Author Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>The author you are looking for could not be found.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="p-4 space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">{author.name}</CardTitle>
+          <CardTitle className="text-2xl">{fullName}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            {author.biography || 'No biography available'}
+            No biography available
+            {/* {author.biography || 'No biography available'} */}
           </p>
         </CardContent>
       </Card>
@@ -55,14 +89,14 @@ function AuthorComponent() {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[400px] pr-4">
-            {author.books?.length > 0 ? (
+            {author.books && author.books.length > 0 ? (
               <div className="space-y-4">
                 {author.books.map((book) => (
-                  <Card key={book.id}>
+                  <Card key={book.id || `book-${Math.random()}`}>
                     <CardContent className="p-4">
-                      <h3 className="font-semibold">{book.title}</h3>
+                      <h3 className="font-semibold">{book.title || 'Untitled'}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Published: {new Date(book.publishedDate).getFullYear()}
+                        Published: {book.published_date? new Date(book.published_date).getFullYear() : 'Unknown year'}
                       </p>
                     </CardContent>
                   </Card>

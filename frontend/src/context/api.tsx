@@ -13,6 +13,10 @@ export function ApiContextProvider({ children }: { children: React.ReactNode }) 
   const api = React.useMemo(() => {
     const fetchClient = createFetchClient<paths>({
       baseUrl: "http://localhost:8080/api/v1",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
 
     return createClient(fetchClient)
