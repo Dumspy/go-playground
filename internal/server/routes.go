@@ -34,6 +34,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 			authors.POST("", s.createAuthorHandler)
 			authors.GET("/:id", s.getAuthorHandler)
 		}
+
+		books := api.Group("/books")
+		{
+			books.POST("", s.createBookHandler)
+		}
 	}
 
 	openapi.RegisterOpenApiRoute(r)
@@ -43,13 +48,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 func (s *Server) healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.db.Health())
-}
-
-// AuthorResponse is the response struct for the listAuthorsHandler
-type ListAuthorResponse struct {
-	ID        uint   `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
 }
 
 // Authors
@@ -140,8 +138,43 @@ func (s *Server) getAuthorHandler(c *gin.Context) {
 		return
 	}
 
+	author, err := s.db.GetAuthor(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, author)
+}
+
+// Books
+// @Summary Create book
+// @Description Create a new book with a valid author
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param book body CreateBookInput true "Book input object"
+// @Success 201 {object} models.Book
+// @Failure 400 {object} string "Invalid request or missing author"
+// @Failure 404 {object} string "Author not found"
+// @Failure 500 {object} string "Server error"
+// @Router /books [post]
+func (s *Server) createBookHandler(c *gin.Context) {
+	var input CreateBookInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate that the book has an author
+	if input.AuthorID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Book must have an author"})
+		return
+	}
+
+	// Verify the author exists
 	var author models.Author
-	if err := s.db.Read(&author, uint(id64)); err != nil {
+	if err := s.db.Read(&author, input.AuthorID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -151,5 +184,12 @@ func (s *Server) getAuthorHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, author)
+	// Convert input to model and create the book
+	book := input.ToModel()
+	if err := s.db.Create(&book); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, book)
 }

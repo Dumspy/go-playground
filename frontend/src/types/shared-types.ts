@@ -163,32 +163,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create book
+         * @description Create a new book with a valid author
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Book input object */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_server.CreateBookInput"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
+                    };
+                };
+                /** @description Invalid request or missing author */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Author not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         "go-playground_internal_database_models.Author": {
-            books?: components["schemas"]["go-playground_internal_database_models.Book"][];
-            createdAt?: string;
-            deletedAt?: components["schemas"]["gorm.DeletedAt"];
-            firstname: string;
-            id?: number;
-            lastname: string;
-            updatedAt?: string;
+            Books?: components["schemas"]["go-playground_internal_database_models.Book"][];
+            CreatedAt?: string;
+            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
+            FirstName: string;
+            ID?: number;
+            LastName: string;
+            UpdatedAt?: string;
         };
         "go-playground_internal_database_models.Book": {
-            authorID?: number;
-            createdAt?: string;
-            deletedAt?: components["schemas"]["gorm.DeletedAt"];
-            id?: number;
-            published_date: string;
-            title: string;
-            updatedAt?: string;
+            AuthorID?: number;
+            CreatedAt?: string;
+            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
+            ID?: number;
+            PublishedData: string;
+            Title: string;
+            UpdatedAt?: string;
         };
         "gorm.DeletedAt": {
-            time?: string;
+            Time?: string;
             /** @description Valid is true if Time is not NULL */
-            valid?: boolean;
+            Valid?: boolean;
+        };
+        "internal_server.CreateBookInput": {
+            AuthorID: number;
+            PublishedDate: string;
+            /** @description Embed fields directly from models.Book, but not the gorm.Model */
+            Title: string;
         };
         "internal_server.ListAuthorResponse": {
             firstname?: string;

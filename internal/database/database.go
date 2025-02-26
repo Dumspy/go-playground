@@ -31,6 +31,8 @@ type Service interface {
 	Update(entity any) error
 	Delete(entity any, id uint) error
 	List(entities any, limit int, offset int) error
+
+	GetAuthor(id uint) (*models.Author, error)
 }
 
 type service struct {
@@ -199,4 +201,12 @@ func (s *service) List(entities any, limit int, offset int) error {
 	}
 
 	return nil
+}
+
+func (s *service) GetAuthor(id uint) (*models.Author, error) {
+	var author models.Author
+	if err := s.db.Preload("Books").First(&author, id).Error; err != nil {
+		return nil, err
+	}
+	return &author, nil
 }

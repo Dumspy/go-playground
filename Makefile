@@ -46,12 +46,12 @@ watch:
 #Swagger
 swagger:
 	@if command -v swag > /dev/null; then \
-		swag init --v3.1 -pd -g cmd/api/main.go --output ./openapi --outputTypes json; \
+		swag init --v3.1 -pd --propertyStrategy pascalcase -g cmd/api/main.go --output ./openapi --outputTypes json; \
 	else \
 		read -p "Go's 'swag' is not installed on your machine. Do you want to install it? [Y/n] " choice; \
 		if [ "$$choice" != "n" ] && [ "$$choice" != "N" ]; then \
 			go install github.com/swaggo/swag/v2/cmd/swag@latest; \
-			swag init --v3.1 -pd -g cmd/api/main.go --output ./openapi --outputTypes json; \
+			swag init --v3.1 -pd --propertyStrategy pascalcase -g cmd/api/main.go --output ./openapi --outputTypes json; \
 		else \
 			echo "You chose not to install swag. Exiting..."; \
 			exit 1; \

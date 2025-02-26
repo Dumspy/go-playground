@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApi } from '@/context/api'
+import React from 'react'
 
 export const Route = createFileRoute('/authors/$authorId')({
   component: AuthorComponent,
@@ -17,10 +18,16 @@ function AuthorComponent() {
       path: { id: Number(authorId)},
     },
   })
-
-  const fullName = [author?.firstname, author?.lastname]
-  .filter(Boolean)
-  .join(' ') || "Unknown Author";
+  
+  // Move useMemo here, before any conditional returns
+  const fullName = React.useMemo(() => {
+    // Handle case where author might be undefined
+    if (!author) return "Unknown Author";
+    
+    return [author.FirstName, author.LastName]
+      .filter(Boolean)
+      .join(' ') || "Unknown Author";
+  }, [author]);
   
   if (isLoading) {
     return (
@@ -88,15 +95,15 @@ function AuthorComponent() {
           <CardTitle>Published Books</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[400px] pr-4">
-            {author.books && author.books.length > 0 ? (
+          <ScrollArea className="h-[400px] pr-4"> 
+            {author.Books && author.Books.length > 0 ? (
               <div className="space-y-4">
-                {author.books.map((book) => (
-                  <Card key={book.id || `book-${Math.random()}`}>
+                {author.Books.map((book) => (
+                  <Card key={book.ID || `book-${Math.random()}`}>
                     <CardContent className="p-4">
-                      <h3 className="font-semibold">{book.title || 'Untitled'}</h3>
+                      <h3 className="font-semibold">{book.Title || 'Untitled'}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Published: {book.published_date? new Date(book.published_date).getFullYear() : 'Unknown year'}
+                        Published: {book.PublishedData? new Date(book.PublishedData).getFullYear() : 'Unknown year'}
                       </p>
                     </CardContent>
                   </Card>
