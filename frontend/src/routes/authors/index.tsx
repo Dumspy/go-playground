@@ -16,7 +16,7 @@ function RouteComponent() {
 
   return (
     <div className="p-2 flex flex-col items-center">
-      <h2 className='text-2xl text-center'>Our authors</h2>
+      <h2 className='text-2xl text-center'>Our Authors</h2>
       <p className='text-center text-gray-600'>Meet the brilliant minds behind our content</p>
       <div className="mt-4 w-full max-w-4xl">
         {isLoading ? (
