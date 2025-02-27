@@ -1,6 +1,20 @@
 import { Link } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
+import { 
+  Sheet, 
+  SheetTrigger, 
+  SheetContent,
+  SheetTitle,
+  SheetHeader,
+  SheetDescription 
+} from "@/components/ui/sheet"
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
 import { Menu, Book } from "lucide-react"
 
 const items = {
@@ -30,37 +44,49 @@ export default function NavHeader() {
           <Book className="h-6 w-6" />
           <span className="sr-only">Company logo</span>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-          {Object.values(items).map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            >
-              {item.title}  
-            </Link>
-          ))}
-        </nav>
+        
+        {/* Desktop Navigation using shadcn NavigationMenu */}
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList>
+            {Object.values(items).map((item) => (
+              <NavigationMenuItem key={item.href}>
+                <NavigationMenuLink asChild>
+                  <Link to={item.href} className={navigationMenuTriggerStyle()}>
+                    {item.title}
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+        
+        {/* Mobile Navigation - Sheet */}
         <div>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full md:hidden">
-                <Menu className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="md:hidden">
-              <div className="grid gap-4 p-4">
+              <SheetHeader>
+                <SheetTitle>Navigation</SheetTitle>
+                <SheetDescription>
+                  Browse the available pages of our application.
+                </SheetDescription>
+              </SheetHeader>
+              <nav className="grid gap-6 py-6">
                 {Object.values(items).map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
-                    className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                    className="text-base font-medium transition-colors hover:text-primary"
                   >
                     {item.title}
                   </Link> 
                 ))}
-              </div>
+              </nav>
             </SheetContent>
           </Sheet>
         </div>
