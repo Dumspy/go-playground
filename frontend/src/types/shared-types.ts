@@ -35,7 +35,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["internal_server.ListAuthorResponse"][];
+                        "application/json": components["schemas"]["go-playground_internal_server_types.ListAuthorResponse"][];
                     };
                 };
                 /** @description Internal Server Error */
@@ -170,7 +170,44 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List books
+         * @description List all books
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Limit */
+                    limit?: number;
+                    /** @description Offset */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_server_types.ListBookResponse"][];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
         put?: never;
         /**
          * Create book
@@ -186,7 +223,7 @@ export interface paths {
             /** @description Book input object */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["internal_server.CreateBookInput"];
+                    "application/json": components["schemas"]["go-playground_internal_server_types.CreateBookInput"];
                 };
             };
             responses: {
@@ -234,43 +271,158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/books/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get book
+         * @description Get book by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Book ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        "go-playground_internal_database_models.Artist": {
+            Covers?: components["schemas"]["go-playground_internal_database_models.Cover"][];
+            CreatedAt?: string;
+            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
+            ID?: number;
+            UpdatedAt?: string;
+            first_name: string;
+            last_name: string;
+        };
         "go-playground_internal_database_models.Author": {
             Books?: components["schemas"]["go-playground_internal_database_models.Book"][];
             CreatedAt?: string;
             DeletedAt?: components["schemas"]["gorm.DeletedAt"];
-            FirstName: string;
             ID?: number;
-            LastName: string;
             UpdatedAt?: string;
+            first_name: string;
+            last_name: string;
         };
         "go-playground_internal_database_models.Book": {
             AuthorID?: number;
+            Cover?: components["schemas"]["go-playground_internal_database_models.Cover"];
             CreatedAt?: string;
             DeletedAt?: components["schemas"]["gorm.DeletedAt"];
             ID?: number;
-            PublishedData: string;
-            Title: string;
             UpdatedAt?: string;
+            description: string;
+            digital_only: boolean;
+            genres?: components["schemas"]["go-playground_internal_database_models.Genre"][];
+            isbn: string;
+            pages: number;
+            price: number;
+            published_date: string;
+            title: string;
+        };
+        "go-playground_internal_database_models.Cover": {
+            Artists?: components["schemas"]["go-playground_internal_database_models.Artist"][];
+            CreatedAt?: string;
+            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
+            ID?: number;
+            UpdatedAt?: string;
+            book_id: number;
+            design_ideas: components["schemas"]["sql.NullString"];
+            image_url?: components["schemas"]["sql.NullString"];
+        };
+        "go-playground_internal_database_models.Genre": {
+            CreatedAt?: string;
+            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
+            ID?: number;
+            UpdatedAt?: string;
+            books?: components["schemas"]["go-playground_internal_database_models.Book"][];
+            name: string;
+        };
+        "go-playground_internal_server_types.CreateBookInput": {
+            author_id: number;
+            published_date: string;
+            title: string;
+        };
+        "go-playground_internal_server_types.ListAuthorResponse": {
+            first_name?: string;
+            id?: number;
+            last_name?: string;
+        };
+        "go-playground_internal_server_types.ListBookResponse": {
+            Cover?: components["schemas"]["go-playground_internal_server_types.ListCoverResponse"];
+            author_id?: number;
+            description?: string;
+            digital_only?: boolean;
+            genres?: string[];
+            id?: number;
+            isbn?: string;
+            pages?: number;
+            price?: number;
+            published_date?: string;
+            title?: string;
+        };
+        "go-playground_internal_server_types.ListCoverResponse": {
+            id?: number;
+            image_url?: string;
         };
         "gorm.DeletedAt": {
             Time?: string;
             /** @description Valid is true if Time is not NULL */
             Valid?: boolean;
         };
-        "internal_server.CreateBookInput": {
-            AuthorID: number;
-            PublishedDate: string;
-            /** @description Embed fields directly from models.Book, but not the gorm.Model */
-            Title: string;
-        };
-        "internal_server.ListAuthorResponse": {
-            firstname?: string;
-            id?: number;
-            lastname?: string;
+        "sql.NullString": {
+            String?: string;
+            /** @description Valid is true if String is not NULL */
+            Valid?: boolean;
         };
     };
     responses: never;

@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Link } from "@tanstack/react-router";
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,12 +13,11 @@ import {
 } from "@/components/ui/card"
 
 interface AuthorCardProps {
-  author: components["schemas"]["internal_server.ListAuthorResponse"]
+  author: components["schemas"]["go-playground_internal_server_types.ListAuthorResponse"]
 }
 
 export default function AuthorCard({ author }: AuthorCardProps) {
-  // Construct full name from firstname and lastname with fallbacks
-  const fullName = [author?.firstname, author?.lastname]
+  const fullName = [author?.first_name, author?.last_name]
     .filter(Boolean)
     .join(' ') || "Unknown Author";
 

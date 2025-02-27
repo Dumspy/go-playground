@@ -1,9 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApi } from '@/context/api'
 import React from 'react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/authors/$authorId')({
   component: AuthorComponent,
@@ -15,20 +18,20 @@ function AuthorComponent() {
 
   const { data: author, isLoading, error } = api.useQuery('get', '/authors/{id}', {
     params: {
-      path: { id: Number(authorId)},
+      path: { id: Number(authorId) },
     },
   })
-  
+
   // Move useMemo here, before any conditional returns
   const fullName = React.useMemo(() => {
     // Handle case where author might be undefined
     if (!author) return "Unknown Author";
-    
-    return [author.FirstName, author.LastName]
+
+    return [author.first_name, author.last_name]
       .filter(Boolean)
       .join(' ') || "Unknown Author";
   }, [author]);
-  
+
   if (isLoading) {
     return (
       <div className="p-4">
@@ -78,6 +81,10 @@ function AuthorComponent() {
 
   return (
     <div className="p-4 space-y-4">
+      <Button variant="link" asChild className="pl-0 mb-2">
+        <Link to="/authors">&larr; Back to all authors</Link>
+      </Button>
+      
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">{fullName}</CardTitle>
@@ -93,19 +100,88 @@ function AuthorComponent() {
       <Card>
         <CardHeader>
           <CardTitle>Published Books</CardTitle>
+          <CardDescription>Books written by this author</CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[400px] pr-4"> 
+          <ScrollArea className="h-[500px] pr-4">
             {author.Books && author.Books.length > 0 ? (
               <div className="space-y-4">
                 {author.Books.map((book) => (
-                  <Card key={book.ID || `book-${Math.random()}`}>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold">{book.Title || 'Untitled'}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Published: {book.PublishedData? new Date(book.PublishedData).getFullYear() : 'Unknown year'}
-                      </p>
-                    </CardContent>
+                  <Card key={book.ID || `book-${Math.random()}`} className="overflow-hidden">
+                    <div className="sm:flex">
+                      {/* Book cover image */}
+                      <div className="sm:w-32 h-40 sm:h-auto flex-shrink-0">
+                        <img
+                          src={book.Cover?.image_url?.String || 'https://placehold.co/200x300?text=No+Cover'}
+                          alt={`Cover of ${book.title || 'Untitled Book'}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      
+                      {/* Book details */}
+                      <div className="flex flex-col flex-1">
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              {book.genres && book.genres.length > 0 && (
+                                book.genres.map((genre) => (
+                                  <Badge key={genre.ID} variant="outline" className="mb-2">
+                                    {genre.name}
+                                  </Badge>
+                                ))
+                              )}
+                              <CardTitle>{book.title || 'Untitled'}</CardTitle>
+                            </div>
+                            {book.price !== undefined && (
+                              <div className="font-bold">${book.price.toFixed(2)}</div>
+                            )}
+                          </div>
+                        </CardHeader>
+                        
+                        <CardContent>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 gap-x-4 text-sm">
+                            {book.published_date && (
+                              <div>
+                                <span className="text-muted-foreground">Published:</span>{' '}
+                                <span className="font-medium">
+                                  {new Date(book.published_date).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                            
+                            {book.pages !== undefined && (
+                              <div>
+                                <span className="text-muted-foreground">Pages:</span>{' '}
+                                <span className="font-medium">{book.pages}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {book.description && (
+                            <>
+                              <Separator className="my-2" />
+                              <p className="text-muted-foreground text-sm line-clamp-2">
+                                {book.description}
+                              </p>
+                            </>
+                          )}
+                        </CardContent>
+                        
+                        <CardFooter className="mt-auto pt-0">
+                          {book.ID ? (
+                            <Button variant="outline" asChild size="sm">
+                              <Link to="/books/$bookId" params={{ bookId: book.ID.toString() }}>
+                                View Details
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button variant="outline" disabled size="sm">
+                              No Details
+                            </Button>
+                          )}
+                        </CardFooter>
+                      </div>
+                    </div>
                   </Card>
                 ))}
               </div>

@@ -33,6 +33,9 @@ type Service interface {
 	List(entities any, limit int, offset int) error
 
 	GetAuthor(id uint) (*models.Author, error)
+
+	ListBooks(limit int, offset int) ([]models.Book, error)
+	GetBook(id uint) (*models.Book, error)
 }
 
 type service struct {
@@ -209,4 +212,20 @@ func (s *service) GetAuthor(id uint) (*models.Author, error) {
 		return nil, err
 	}
 	return &author, nil
+}
+
+func (s *service) ListBooks(limit int, offset int) ([]models.Book, error) {
+	var books []models.Book
+	if err := s.db.Preload("Cover").Limit(limit).Offset(offset).Find(&books).Error; err != nil {
+		return nil, err
+	}
+	return books, nil
+}
+
+func (s *service) GetBook(id uint) (*models.Book, error) {
+	var book models.Book
+	if err := s.db.Preload("Cover.Artists").Preload("Cover").First(&book, id).Error; err != nil {
+		return nil, err
+	}
+	return &book, nil
 }

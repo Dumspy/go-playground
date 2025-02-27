@@ -2,6 +2,7 @@ package server
 
 import (
 	"go-playground/internal/database/models"
+	"go-playground/internal/server/types"
 	"go-playground/openapi"
 	"net/http"
 	"strconv"
@@ -37,7 +38,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		books := api.Group("/books")
 		{
+			books.GET("", s.listBooksHandler)
 			books.POST("", s.createBookHandler)
+			books.GET("/:id", s.getBookHandler)
 		}
 	}
 
@@ -57,7 +60,7 @@ func (s *Server) healthHandler(c *gin.Context) {
 // @Produce json
 // @Param limit query int false "Limit"
 // @Param offset query int false "Offset"
-// @Success 200 {array} ListAuthorResponse
+// @Success 200 {array} types.ListAuthorResponse
 // @Failure 500 {string} string
 // @Router /authors [get]
 func (s *Server) listAuthorsHandler(c *gin.Context) {
@@ -82,9 +85,9 @@ func (s *Server) listAuthorsHandler(c *gin.Context) {
 		return
 	}
 
-	var response []ListAuthorResponse
+	var response []types.ListAuthorResponse
 	for _, author := range authors {
-		response = append(response, ListAuthorResponse{
+		response = append(response, types.ListAuthorResponse{
 			ID:        author.ID,
 			FirstName: author.FirstName,
 			LastName:  author.LastName,
@@ -153,14 +156,14 @@ func (s *Server) getAuthorHandler(c *gin.Context) {
 // @Tags books
 // @Accept json
 // @Produce json
-// @Param book body CreateBookInput true "Book input object"
+// @Param book body types.CreateBookInput true "Book input object"
 // @Success 201 {object} models.Book
 // @Failure 400 {object} string "Invalid request or missing author"
 // @Failure 404 {object} string "Author not found"
 // @Failure 500 {object} string "Server error"
 // @Router /books [post]
 func (s *Server) createBookHandler(c *gin.Context) {
-	var input CreateBookInput
+	var input types.CreateBookInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -192,4 +195,79 @@ func (s *Server) createBookHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, book)
+}
+
+// Books
+// @Summary List books
+// @Description List all books
+// @Tags books
+// @Produce json
+// @Param limit query int false "Limit"
+// @Param offset query int false "Offset"
+// @Success 200 {array} types.ListBookResponse
+// @Failure 500 {string} string
+// @Router /books [get]
+func (s *Server) listBooksHandler(c *gin.Context) {
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit format"})
+		return
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset format"})
+		return
+	}
+
+	books, err := s.db.ListBooks(limit, offset)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var response []types.ListBookResponse
+	for _, book := range books {
+		response = append(response, types.ListBookResponse{
+			ID:            book.ID,
+			Title:         book.Title,
+			DigitalOnly:   book.DigitalOnly,
+			PublishedDate: book.PublishedDate.Format("2006-01-02"),
+			AuthorID:      book.AuthorID,
+			Cover:         types.ListCoverResponse{ID: book.Cover.ID, ImageURL: book.Cover.ImageURL.String},
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// Books
+// @Summary Get book
+// @Description Get book by ID
+// @Tags books
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /books/{id} [get]
+func (s *Server) getBookHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	book, err := s.db.GetBook(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, book)
 }

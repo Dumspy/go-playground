@@ -12,6 +12,10 @@ const items = {
     title: 'Authors',
     href: '/authors',
   },
+  books: {
+    title: 'Books',
+    href: '/books',
+  },
   about: {
     title: 'About',
     href: '/about',

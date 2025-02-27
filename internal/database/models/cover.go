@@ -1,14 +1,15 @@
 package models
 
 import (
+	"database/sql"
+
 	"gorm.io/gorm"
 )
 
 type Cover struct {
 	gorm.Model
-	DesignIdeas string `json:"DesignIdeas" binding:"required"`
-	DigitalOnly bool   `json:"DigitalOnly" binding:"required"`
-	BookID      uint
-	Book        Book
-	Artists     []*Artist `gorm:"many2many:artist_covers;"`
+	DesignIdeas sql.NullString `json:"design_ideas" binding:"required"`
+	ImageURL    sql.NullString `json:"image_url"`
+	BookID      uint           `json:"book_id" binding:"required"`
+	Artists     []*Artist      `gorm:"many2many:artist_covers;"`
 }

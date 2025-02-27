@@ -6,13 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
-// BookPublishedDate is a type alias to use in both model and input
-// This ensures that changes to the type are reflected in both places
-type BookPublishedDate = time.Time
-
 type Book struct {
 	gorm.Model
-	Title         string            `json:"Title" binding:"required"`
-	PublishedDate BookPublishedDate `json:"PublishedData" binding:"required"`
+	Title         string    `json:"title" binding:"required"`
+	PublishedDate time.Time `json:"published_date" binding:"required"`
+	DigitalOnly   bool      `json:"digital_only" binding:"required" gorm:"default:false"`
+	Pages         uint      `json:"pages" binding:"required"`
+	Description   string    `json:"description" binding:"required"`
+	ISBN          string    `json:"isbn" binding:"required"`
+	Price         float32   `json:"price" binding:"required"`
+	Genres        []*Genre  `json:"genres" gorm:"many2many:book_genres;"`
+	Cover         Cover
 	AuthorID      uint
 }
