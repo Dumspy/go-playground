@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { 
   Sheet, 
   SheetTrigger, 
@@ -15,7 +15,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { Menu, Book } from "lucide-react"
+import { Menu, Book, LogIn } from "lucide-react"
 
 const items = {
   home: {
@@ -39,29 +39,44 @@ const items = {
 export default function NavHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:border-gray-800 dark:bg-gray-950">
-      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
-        <Link to="/" className="flex items-center gap-2">
-          <Book className="h-6 w-6" />
-          <span className="sr-only">Company logo</span>
-        </Link>
+      <div className="container mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
+        {/* Left section - Logo */}
+        <div className="flex-shrink-0 mr-4">
+          <Link to="/" className="flex items-center gap-2">
+            <Book className="h-6 w-6" />
+            <span className="sr-only">Company logo</span>
+          </Link>
+        </div>
         
-        {/* Desktop Navigation using shadcn NavigationMenu */}
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList>
-            {Object.values(items).map((item) => (
-              <NavigationMenuItem key={item.href}>
-                <NavigationMenuLink asChild>
-                  <Link to={item.href} className={navigationMenuTriggerStyle()}>
-                    {item.title}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+        {/* Middle section - Navigation */}
+        <div className="flex-grow">
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+              {Object.values(items).map((item) => (
+                <NavigationMenuItem key={item.href}>
+                  <NavigationMenuLink asChild>
+                    <Link to={item.href} className={navigationMenuTriggerStyle()}>
+                      {item.title}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
         
-        {/* Mobile Navigation - Sheet */}
-        <div>
+        {/* Right section - Login button and mobile menu */}
+        <div className="flex items-center gap-2">
+          {/* Login Button */}
+          <Link
+            to="/admin/dashboard"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            <LogIn className="mr-2 h-4 w-4" />
+            <span className="hidden md:inline">Login</span>
+          </Link>
+          
+          {/* Mobile Navigation */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full md:hidden">

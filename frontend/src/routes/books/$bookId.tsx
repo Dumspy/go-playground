@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useApi } from '@/context/api'
 import { Link } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -34,9 +34,9 @@ function RouteComponent() {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="pt-6 flex flex-col items-center">
           <p className="text-destructive">Error loading book details</p>
-          <Button variant="link" asChild className="mt-4">
-            <Link to="/books">Back to books</Link>
-          </Button>
+          <Link to="/books" className={buttonVariants({ variant: "link", className: "mt-4" })}>
+            Back to books
+          </Link>
         </CardContent>
       </Card>
     )
@@ -47,9 +47,9 @@ function RouteComponent() {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="pt-6 flex flex-col items-center">
           <p className="text-muted-foreground">Book not found</p>
-          <Button variant="link" asChild className="mt-4">
-            <Link to="/books">Back to books</Link>
-          </Button>
+          <Link to="/books" className={buttonVariants({ variant: "link", className: "mt-4" })}>
+            Back to books
+          </Link>
         </CardContent>
       </Card>
     )
@@ -57,9 +57,9 @@ function RouteComponent() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <Button variant="link" asChild className="pl-0 mb-6">
-        <Link to="/books">&larr; Back to all books</Link>
-      </Button>
+      <Link to="/books" className={buttonVariants({ variant: "link", className: "pl-0 mb-6" })}>
+        &larr; Back to all books
+      </Link>
 
       <Card className="overflow-hidden">
         <div className="md:flex">

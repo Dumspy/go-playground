@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApi } from '@/context/api'
 import React from 'react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
@@ -81,9 +81,7 @@ function AuthorComponent() {
 
   return (
     <div className="p-4 space-y-4">
-      <Button variant="link" asChild className="pl-0 mb-2">
-        <Link to="/authors">&larr; Back to all authors</Link>
-      </Button>
+      <Link to="/authors" className={buttonVariants({ variant: "outline", className: "pl-0 mb-2"})}>&larr; Back to all authors</Link>
       
       <Card>
         <CardHeader>
@@ -169,11 +167,13 @@ function AuthorComponent() {
                         
                         <CardFooter className="mt-auto pt-0">
                           {book.ID ? (
-                            <Button variant="outline" asChild size="sm">
-                              <Link to="/books/$bookId" params={{ bookId: book.ID.toString() }}>
-                                View Details
-                              </Link>
-                            </Button>
+                            <Link 
+                              to="/books/$bookId" 
+                              params={{ bookId: book.ID.toString() }}
+                              className={buttonVariants({ variant: "outline", size: "sm" })}
+                            >
+                              View Details
+                            </Link>
                           ) : (
                             <Button variant="outline" disabled size="sm">
                               No Details
