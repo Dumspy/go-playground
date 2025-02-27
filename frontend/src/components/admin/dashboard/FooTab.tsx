@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function FooTab() {
+export default function FooTab() {
   return (
     <div className="p-4 border rounded-lg">
       <h2 className="text-lg font-medium">Foo Content</h2>

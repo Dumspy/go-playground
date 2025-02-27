@@ -17,9 +17,7 @@ import { Route as BooksIndexImport } from './routes/books/index'
 import { Route as AuthorsIndexImport } from './routes/authors/index'
 import { Route as BooksBookIdImport } from './routes/books/$bookId'
 import { Route as AuthorsAuthorIdImport } from './routes/authors/$authorId'
-import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
-import { Route as AdminDashboardFooTabImport } from './routes/admin/dashboard/FooTab'
-import { Route as AdminDashboardBarTabImport } from './routes/admin/dashboard/BarTab'
+import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 
 // Create/Update Routes
 
@@ -59,21 +57,9 @@ const AuthorsAuthorIdRoute = AuthorsAuthorIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminDashboardIndexRoute = AdminDashboardIndexImport.update({
-  id: '/admin/dashboard/',
-  path: '/admin/dashboard/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AdminDashboardFooTabRoute = AdminDashboardFooTabImport.update({
-  id: '/admin/dashboard/FooTab',
-  path: '/admin/dashboard/FooTab',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AdminDashboardBarTabRoute = AdminDashboardBarTabImport.update({
-  id: '/admin/dashboard/BarTab',
-  path: '/admin/dashboard/BarTab',
+const AdminDashboardRoute = AdminDashboardImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -93,6 +79,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardImport
       parentRoute: typeof rootRoute
     }
     '/authors/$authorId': {
@@ -123,27 +116,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksIndexImport
       parentRoute: typeof rootRoute
     }
-    '/admin/dashboard/BarTab': {
-      id: '/admin/dashboard/BarTab'
-      path: '/admin/dashboard/BarTab'
-      fullPath: '/admin/dashboard/BarTab'
-      preLoaderRoute: typeof AdminDashboardBarTabImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/dashboard/FooTab': {
-      id: '/admin/dashboard/FooTab'
-      path: '/admin/dashboard/FooTab'
-      fullPath: '/admin/dashboard/FooTab'
-      preLoaderRoute: typeof AdminDashboardFooTabImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/dashboard/': {
-      id: '/admin/dashboard/'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardIndexImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -152,38 +124,32 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
-  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
-  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
-  '/admin/dashboard': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
-  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
-  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
-  '/admin/dashboard': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors/': typeof AuthorsIndexRoute
   '/books/': typeof BooksIndexRoute
-  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
-  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
-  '/admin/dashboard/': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -191,60 +157,50 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin/dashboard'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors'
     | '/books'
-    | '/admin/dashboard/BarTab'
-    | '/admin/dashboard/FooTab'
-    | '/admin/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/admin/dashboard'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors'
     | '/books'
-    | '/admin/dashboard/BarTab'
-    | '/admin/dashboard/FooTab'
-    | '/admin/dashboard'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin/dashboard'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors/'
     | '/books/'
-    | '/admin/dashboard/BarTab'
-    | '/admin/dashboard/FooTab'
-    | '/admin/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AuthorsAuthorIdRoute: typeof AuthorsAuthorIdRoute
   BooksBookIdRoute: typeof BooksBookIdRoute
   AuthorsIndexRoute: typeof AuthorsIndexRoute
   BooksIndexRoute: typeof BooksIndexRoute
-  AdminDashboardBarTabRoute: typeof AdminDashboardBarTabRoute
-  AdminDashboardFooTabRoute: typeof AdminDashboardFooTabRoute
-  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
   AuthorsAuthorIdRoute: AuthorsAuthorIdRoute,
   BooksBookIdRoute: BooksBookIdRoute,
   AuthorsIndexRoute: AuthorsIndexRoute,
   BooksIndexRoute: BooksIndexRoute,
-  AdminDashboardBarTabRoute: AdminDashboardBarTabRoute,
-  AdminDashboardFooTabRoute: AdminDashboardFooTabRoute,
-  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -259,13 +215,11 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/admin/dashboard",
         "/authors/$authorId",
         "/books/$bookId",
         "/authors/",
-        "/books/",
-        "/admin/dashboard/BarTab",
-        "/admin/dashboard/FooTab",
-        "/admin/dashboard/"
+        "/books/"
       ]
     },
     "/": {
@@ -273,6 +227,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/admin/dashboard": {
+      "filePath": "admin/dashboard.tsx"
     },
     "/authors/$authorId": {
       "filePath": "authors/$authorId.tsx"
@@ -285,15 +242,6 @@ export const routeTree = rootRoute
     },
     "/books/": {
       "filePath": "books/index.tsx"
-    },
-    "/admin/dashboard/BarTab": {
-      "filePath": "admin/dashboard/BarTab.tsx"
-    },
-    "/admin/dashboard/FooTab": {
-      "filePath": "admin/dashboard/FooTab.tsx"
-    },
-    "/admin/dashboard/": {
-      "filePath": "admin/dashboard/index.tsx"
     }
   }
 }
