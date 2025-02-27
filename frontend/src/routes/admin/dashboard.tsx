@@ -6,15 +6,10 @@ import { useNavigate } from '@tanstack/react-router'
 
 // Define tab values and labels first
 const tabDefinitions = [
-  { value: 'foo', label: 'Foo' },
-  { value: 'bar', label: 'Bar' },
+  { value: 'foo', label: 'Foo', component: React.lazy(() => import('@/components/admin/dashboard/FooTab')) },
+  { value: 'bar', label: 'Bar', component: React.lazy(() => import('@/components/admin/dashboard/BarTab')) },
+  { value: 'authors', label: 'Authors', component: React.lazy(() => import('@/components/admin/dashboard/tabs/authors')) },
 ];
-
-// Create lazy components map separately
-const TabComponents = {
-  foo: React.lazy(() => import('@/components/admin/dashboard/FooTab')),
-  bar: React.lazy(() => import('@/components/admin/dashboard/BarTab')),
-};
 
 // Use the definitions for schema validation
 const searchSchema = z.object({
@@ -55,7 +50,7 @@ function RouteComponent() {
         </TabsList>
         
         {tabDefinitions.map(tab => {
-          const TabComponent = TabComponents[tab.value as keyof typeof TabComponents];
+          const TabComponent = tab.component
           return (
             <TabsContent key={tab.value} value={tab.value}>
               <React.Suspense fallback={<div>Loading...</div>}>
