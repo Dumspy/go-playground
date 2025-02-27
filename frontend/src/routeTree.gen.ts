@@ -17,6 +17,9 @@ import { Route as BooksIndexImport } from './routes/books/index'
 import { Route as AuthorsIndexImport } from './routes/authors/index'
 import { Route as BooksBookIdImport } from './routes/books/$bookId'
 import { Route as AuthorsAuthorIdImport } from './routes/authors/$authorId'
+import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
+import { Route as AdminDashboardFooTabImport } from './routes/admin/dashboard/FooTab'
+import { Route as AdminDashboardBarTabImport } from './routes/admin/dashboard/BarTab'
 
 // Create/Update Routes
 
@@ -53,6 +56,24 @@ const BooksBookIdRoute = BooksBookIdImport.update({
 const AuthorsAuthorIdRoute = AuthorsAuthorIdImport.update({
   id: '/authors/$authorId',
   path: '/authors/$authorId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminDashboardIndexRoute = AdminDashboardIndexImport.update({
+  id: '/admin/dashboard/',
+  path: '/admin/dashboard/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminDashboardFooTabRoute = AdminDashboardFooTabImport.update({
+  id: '/admin/dashboard/FooTab',
+  path: '/admin/dashboard/FooTab',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminDashboardBarTabRoute = AdminDashboardBarTabImport.update({
+  id: '/admin/dashboard/BarTab',
+  path: '/admin/dashboard/BarTab',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +123,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksIndexImport
       parentRoute: typeof rootRoute
     }
+    '/admin/dashboard/BarTab': {
+      id: '/admin/dashboard/BarTab'
+      path: '/admin/dashboard/BarTab'
+      fullPath: '/admin/dashboard/BarTab'
+      preLoaderRoute: typeof AdminDashboardBarTabImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/dashboard/FooTab': {
+      id: '/admin/dashboard/FooTab'
+      path: '/admin/dashboard/FooTab'
+      fullPath: '/admin/dashboard/FooTab'
+      preLoaderRoute: typeof AdminDashboardFooTabImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/dashboard/': {
+      id: '/admin/dashboard/'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -114,6 +156,9 @@ export interface FileRoutesByFullPath {
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
+  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
+  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
+  '/admin/dashboard': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -123,6 +168,9 @@ export interface FileRoutesByTo {
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
+  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
+  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
+  '/admin/dashboard': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRoutesById {
@@ -133,6 +181,9 @@ export interface FileRoutesById {
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors/': typeof AuthorsIndexRoute
   '/books/': typeof BooksIndexRoute
+  '/admin/dashboard/BarTab': typeof AdminDashboardBarTabRoute
+  '/admin/dashboard/FooTab': typeof AdminDashboardFooTabRoute
+  '/admin/dashboard/': typeof AdminDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -144,6 +195,9 @@ export interface FileRouteTypes {
     | '/books/$bookId'
     | '/authors'
     | '/books'
+    | '/admin/dashboard/BarTab'
+    | '/admin/dashboard/FooTab'
+    | '/admin/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +206,9 @@ export interface FileRouteTypes {
     | '/books/$bookId'
     | '/authors'
     | '/books'
+    | '/admin/dashboard/BarTab'
+    | '/admin/dashboard/FooTab'
+    | '/admin/dashboard'
   id:
     | '__root__'
     | '/'
@@ -160,6 +217,9 @@ export interface FileRouteTypes {
     | '/books/$bookId'
     | '/authors/'
     | '/books/'
+    | '/admin/dashboard/BarTab'
+    | '/admin/dashboard/FooTab'
+    | '/admin/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
@@ -170,6 +230,9 @@ export interface RootRouteChildren {
   BooksBookIdRoute: typeof BooksBookIdRoute
   AuthorsIndexRoute: typeof AuthorsIndexRoute
   BooksIndexRoute: typeof BooksIndexRoute
+  AdminDashboardBarTabRoute: typeof AdminDashboardBarTabRoute
+  AdminDashboardFooTabRoute: typeof AdminDashboardFooTabRoute
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -179,6 +242,9 @@ const rootRouteChildren: RootRouteChildren = {
   BooksBookIdRoute: BooksBookIdRoute,
   AuthorsIndexRoute: AuthorsIndexRoute,
   BooksIndexRoute: BooksIndexRoute,
+  AdminDashboardBarTabRoute: AdminDashboardBarTabRoute,
+  AdminDashboardFooTabRoute: AdminDashboardFooTabRoute,
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -196,7 +262,10 @@ export const routeTree = rootRoute
         "/authors/$authorId",
         "/books/$bookId",
         "/authors/",
-        "/books/"
+        "/books/",
+        "/admin/dashboard/BarTab",
+        "/admin/dashboard/FooTab",
+        "/admin/dashboard/"
       ]
     },
     "/": {
@@ -216,6 +285,15 @@ export const routeTree = rootRoute
     },
     "/books/": {
       "filePath": "books/index.tsx"
+    },
+    "/admin/dashboard/BarTab": {
+      "filePath": "admin/dashboard/BarTab.tsx"
+    },
+    "/admin/dashboard/FooTab": {
+      "filePath": "admin/dashboard/FooTab.tsx"
+    },
+    "/admin/dashboard/": {
+      "filePath": "admin/dashboard/index.tsx"
     }
   }
 }
