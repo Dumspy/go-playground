@@ -1,30 +1,30 @@
 import React from "react";
 import { useApi } from "@/context/api";
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
@@ -36,21 +36,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  useReactTable, 
-  getCoreRowModel, 
-  flexRender, 
-  getPaginationRowModel, 
-  ColumnDef, 
-  SortingState, 
-  getSortedRowModel 
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getPaginationRowModel,
+  ColumnDef,
+  SortingState,
+  getSortedRowModel
 } from "@tanstack/react-table";
 import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner"
 import { components } from "@/types/shared-types"
+import TableLoading from "./table-loading";
 
 // Define the Author type based on the model
-type Author = components["schemas"]["go-playground_internal_server_types.ListAuthorResponse"]
+type Author = components["schemas"]["go-playground_internal_database_models.Author"]
 
 type AuthorFormData = {
   first_name: string;
@@ -58,7 +59,7 @@ type AuthorFormData = {
 };
 
 const AuthorsTab: React.FC = () => {
-  const { api } = useApi();
+  const { api, tanClient } = useApi();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [selectedAuthor, setSelectedAuthor] = React.useState<Author | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -68,19 +69,63 @@ const AuthorsTab: React.FC = () => {
     first_name: "",
     last_name: ""
   });
-  
+
   // Fetch authors data using the API context
-  const { 
-    data: authors = [], 
-    isLoading, 
-    isError, 
-    refetch 
-  } = api.useQuery('get',"/authors", {});
+  const {
+    data: authors = [],
+    isLoading,
+    isError,
+  } = api.useQuery('get', "/admin/authors");
+
+  const createAuthorMutation = api.useMutation('post', "/admin/authors", {
+    onSuccess: () => {
+      tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
+      setIsCreateDialogOpen(false);
+      toast("Author created", {
+        description: `${formData.first_name} ${formData.last_name} has been added successfully.`,
+      });
+    },
+    onError: () => {
+      toast("Error", {
+        description: "Failed to create author. Please try again.",
+      });
+    }
+  });
+
+  const deleteAuthorMutation = api.useMutation('delete', "/admin/authors/{id}", {
+    onSuccess: () => {
+      tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
+      setIsDeleteDialogOpen(false);
+      toast("Author deleted", {
+        description: `${selectedAuthor?.first_name} ${selectedAuthor?.last_name} has been removed successfully.`,
+      });
+    },
+    onError: () => {
+      toast("Error", {
+        description: "Failed to delete author. Please try again.",
+      });
+    }
+  });
+
+  const updateAuthorMutation = api.useMutation('patch', "/admin/authors/{id}", {
+    onSuccess: () => {
+      tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
+      setIsEditDialogOpen(false);
+      toast("Author updated", {
+        description: `${formData.first_name} ${formData.last_name} has been updated successfully.`,
+      });
+    },
+    onError: () => {
+      toast("Error", {
+        description: "Failed to update author. Please try again.",
+      });
+    }
+  });
 
   // Define columns for the table
   const columns: ColumnDef<Author>[] = [
     {
-      accessorKey: "id",
+      accessorKey: "ID",
       header: "ID",
     },
     {
@@ -92,18 +137,18 @@ const AuthorsTab: React.FC = () => {
       header: "Last Name",
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "CreatedAt",
       header: "Created At",
       cell: ({ row }) => {
-        const date = new Date(row.getValue("created_at"));
+        const date = new Date(row.getValue("CreatedAt"));
         return date.toLocaleDateString();
       }
     },
     {
-      accessorKey: "updated_at",
+      accessorKey: "UpdatedAt",
       header: "Updated At",
       cell: ({ row }) => {
-        const date = new Date(row.getValue("updated_at"));
+        const date = new Date(row.getValue("UpdatedAt"));
         return date.toLocaleDateString();
       }
     },
@@ -171,64 +216,36 @@ const AuthorsTab: React.FC = () => {
   };
 
   // Create new author
-  const handleCreate = async () => {
-    try {
-      await api.POST("/authors", {
-        body: formData
-      });
-      refetch();
-      setIsCreateDialogOpen(false);
-      toast("Author created", {
-        description: `${formData.first_name} ${formData.last_name} has been added successfully.`,
-      });
-    } catch (error) {
-      toast("Error", {
-        description: "Failed to create author. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleCreate = () => {
+    createAuthorMutation.mutate({
+      body: formData,
+    });
   };
 
   // Update existing author
   const handleUpdate = async () => {
-    if (!selectedAuthor) return;
-    try {
-      await api.PUT(`/authors/${selectedAuthor.id}`, {
-        body: formData
-      });
-      refetch();
-      setIsEditDialogOpen(false);
-      toast("Author updated", {
-        description: `${formData.first_name} ${formData.last_name} has been updated successfully.`,
-      });
-    } catch (error) {
-      toast("Error", {
-        description: "Failed to update author. Please try again.",
-        variant: "destructive",
-      });
-    }
+    if (!selectedAuthor?.ID) return;
+    updateAuthorMutation.mutate({
+      params: {
+        path: { id: selectedAuthor.ID },
+      },
+      body: formData,
+    });
   };
 
   // Delete author
-  const handleDelete = async () => {
-    if (!selectedAuthor) return;
-    try {
-      await api.DELETE(`/authors/${selectedAuthor.id}`, {});
-      refetch();
-      setIsDeleteDialogOpen(false);
-      toast("Author deleted", {
-        description: `${selectedAuthor.first_name} ${selectedAuthor.last_name} has been removed successfully.`,
-      });
-    } catch (error) {
-      toast("Error", {
-        description: "Failed to delete author. Please try again.",
-        variant: "destructive",
+  const handleDelete = () => {
+    if (selectedAuthor?.ID) {
+      deleteAuthorMutation.mutate({
+        params: {
+          path: { id: selectedAuthor.ID }
+        }
       });
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <TableLoading title="Author"/>
   }
 
   if (isError) {
@@ -247,7 +264,7 @@ const AuthorsTab: React.FC = () => {
           Add Author
         </Button>
       </div>
-      
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -258,9 +275,9 @@ const AuthorsTab: React.FC = () => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -290,7 +307,7 @@ const AuthorsTab: React.FC = () => {
           </TableBody>
         </Table>
       </div>
-      
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"

@@ -2,6 +2,7 @@ package server
 
 import (
 	"go-playground/internal/database/models"
+	adminRoutes "go-playground/internal/server/routes/admin"
 	"go-playground/internal/server/types"
 	"go-playground/openapi"
 	"net/http"
@@ -41,6 +42,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 			books.GET("", s.listBooksHandler)
 			books.POST("", s.createBookHandler)
 			books.GET("/:id", s.getBookHandler)
+		}
+
+		admin := api.Group("/admin")
+		{
+			adminBooks := admin.Group("/books")
+			adminRoutes.RegisterBookRoutes(adminBooks)
+
+			adminAuthors := admin.Group("/authors")
+			adminRoutes.RegisterAuthorRoutes(adminAuthors)
 		}
 	}
 

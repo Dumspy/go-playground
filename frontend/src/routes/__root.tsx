@@ -9,7 +9,7 @@ export const Route = createRootRoute({
     <>
       <NavHeader/>
       <Outlet />
-      <Toaster />
+      <Toaster theme='light'/>
       
       {import.meta.env.DEV && (
         <>
