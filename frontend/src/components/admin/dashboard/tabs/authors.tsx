@@ -3,7 +3,6 @@ import { useApi } from "@/context/api";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -16,10 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,14 +46,27 @@ import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner"
 import { components } from "@/types/shared-types"
 import TableLoading from "./table-loading";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 // Define the Author type based on the model
 type Author = components["schemas"]["go-playground_internal_database_models.Author"]
 
-type AuthorFormData = {
-  first_name: string;
-  last_name: string;
-};
+const formSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+});
 
 const AuthorsTab: React.FC = () => {
   const { api, tanClient } = useApi();
@@ -65,9 +75,13 @@ const AuthorsTab: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
-  const [formData, setFormData] = React.useState<AuthorFormData>({
-    first_name: "",
-    last_name: ""
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+    },
   });
 
   // Fetch authors data using the API context
@@ -81,6 +95,7 @@ const AuthorsTab: React.FC = () => {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
       setIsCreateDialogOpen(false);
+      const formData = form.getValues();
       toast("Author created", {
         description: `${formData.first_name} ${formData.last_name} has been added successfully.`,
       });
@@ -111,6 +126,7 @@ const AuthorsTab: React.FC = () => {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
       setIsEditDialogOpen(false);
+      const formData = form.getValues();
       toast("Author updated", {
         description: `${formData.first_name} ${formData.last_name} has been updated successfully.`,
       });
@@ -168,10 +184,8 @@ const AuthorsTab: React.FC = () => {
               <DropdownMenuItem
                 onClick={() => {
                   setSelectedAuthor(author);
-                  setFormData({
-                    first_name: author.first_name || "",
-                    last_name: author.last_name || ""
-                  });
+                  form.setValue("first_name", author.first_name);
+                  form.setValue("last_name", author.last_name);
                   setIsEditDialogOpen(true);
                 }}
               >
@@ -206,30 +220,21 @@ const AuthorsTab: React.FC = () => {
     },
   });
 
-  // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   // Create new author
-  const handleCreate = () => {
+  const handleCreate = (values: z.infer<typeof formSchema>) => {
     createAuthorMutation.mutate({
-      body: formData,
+      body: values,
     });
   };
 
   // Update existing author
-  const handleUpdate = async () => {
+  const handleUpdate = (values: z.infer<typeof formSchema>) => {
     if (!selectedAuthor?.ID) return;
     updateAuthorMutation.mutate({
       params: {
         path: { id: selectedAuthor.ID },
       },
-      body: formData,
+      body: values,
     });
   };
 
@@ -245,7 +250,7 @@ const AuthorsTab: React.FC = () => {
   };
 
   if (isLoading) {
-    return <TableLoading title="Author"/>
+    return <TableLoading title="Author" />
   }
 
   if (isError) {
@@ -257,7 +262,7 @@ const AuthorsTab: React.FC = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Authors</h2>
         <Button onClick={() => {
-          setFormData({ first_name: "", last_name: "" });
+          form.reset();
           setIsCreateDialogOpen(true);
         }}>
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -332,36 +337,41 @@ const AuthorsTab: React.FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Author</DialogTitle>
+            <DialogDescription>
+              Please fill in the details to create a new author.
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="first_name" className="text-right">
-                First Name
-              </Label>
-              <Input
-                id="first_name"
-                name="first_name"
-                className="col-span-3"
-                value={formData.first_name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="last_name" className="text-right">
-                Last Name
-              </Label>
-              <Input
-                id="last_name"
-                name="last_name"
-                className="col-span-3"
-                value={formData.last_name}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleCreate}>Create</Button>
-          </DialogFooter>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleCreate)} className="grid gap-4 py-4">
+                <FormField control={form.control} name="first_name" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="first_name">First Name</FormLabel>
+                    <FormControl>
+                      <Input id="first_name" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Please enter the author's first name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="last_name" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="last_name">Last name</FormLabel>
+                    <FormControl>
+                      <Input id="last_name" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Please enter the author's last name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <DialogFooter>
+                <Button type="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -370,36 +380,41 @@ const AuthorsTab: React.FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Author</DialogTitle>
+            <DialogDescription>
+              Please update the details to edit the author.
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit_first_name" className="text-right">
-                First Name
-              </Label>
-              <Input
-                id="edit_first_name"
-                name="first_name"
-                className="col-span-3"
-                value={formData.first_name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit_last_name" className="text-right">
-                Last Name
-              </Label>
-              <Input
-                id="edit_last_name"
-                name="last_name"
-                className="col-span-3"
-                value={formData.last_name}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleUpdate}>Update</Button>
-          </DialogFooter>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleUpdate)} className="grid gap-4 py-4">
+                <FormField control={form.control} name="first_name" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="first_name">First Name</FormLabel>
+                    <FormControl>
+                      <Input id="first_name" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Please enter the author's first name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="last_name" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="last_name">Last name</FormLabel>
+                    <FormControl>
+                      <Input id="last_name" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Please enter the author's last name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <DialogFooter>
+                <Button type="submit">Update</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
