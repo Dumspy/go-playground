@@ -40,7 +40,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		books := api.Group("/books")
 		{
 			books.GET("", s.listBooksHandler)
-			books.POST("", s.createBookHandler)
 			books.GET("/:id", s.getBookHandler)
 		}
 
@@ -158,53 +157,6 @@ func (s *Server) getAuthorHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, author)
-}
-
-// Books
-// @Summary Create book
-// @Description Create a new book with a valid author
-// @Tags books
-// @Accept json
-// @Produce json
-// @Param book body types.CreateBookInput true "Book input object"
-// @Success 201 {object} models.Book
-// @Failure 400 {object} string "Invalid request or missing author"
-// @Failure 404 {object} string "Author not found"
-// @Failure 500 {object} string "Server error"
-// @Router /books [post]
-func (s *Server) createBookHandler(c *gin.Context) {
-	var input types.CreateBookInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Validate that the book has an author
-	if input.AuthorID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Book must have an author"})
-		return
-	}
-
-	// Verify the author exists
-	var author models.Author
-	if err := s.db.Read(&author, input.AuthorID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if author.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
-		return
-	}
-
-	// Convert input to model and create the book
-	book := input.ToModel()
-	if err := s.db.Create(&book); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, book)
 }
 
 // Books

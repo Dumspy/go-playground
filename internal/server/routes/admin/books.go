@@ -3,8 +3,10 @@ package admin
 import (
 	"go-playground/internal/database"
 	"go-playground/internal/database/models"
+	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +14,51 @@ import (
 // BooksController handles book-related routes
 type BooksController struct {
 	db database.Service
+}
+
+// BookDTO is used for both create and update operations
+// Using pointers for fields allows us to distinguish between zero values and not provided values
+type BookDTO struct {
+	ID            *uint      `json:"id" binding:"-"` // Added ID field for validation purposes
+	Title         *string    `json:"title" binding:"required_without=ID"`
+	PublishedDate *time.Time `json:"published_date" binding:"required_without=ID"`
+	Pages         *uint      `json:"pages" binding:"required_without=ID"`
+	Description   *string    `json:"description" binding:"required_without=ID"`
+	ISBN          *string    `json:"isbn" binding:"required_without=ID"`
+	Price         *float32   `json:"price" binding:"required_without=ID"`
+	AuthorID      *uint      `json:"author_id" binding:"required_without=ID"`
+}
+
+// ApplyToModel applies the DTO data to a model instance
+func (dto *BookDTO) ApplyToModel(book *models.Book) {
+	if dto.Title != nil {
+		book.Title = *dto.Title
+	}
+	if dto.PublishedDate != nil {
+		book.PublishedDate = *dto.PublishedDate
+	}
+	if dto.Pages != nil {
+		book.Pages = *dto.Pages
+	}
+	if dto.Description != nil {
+		book.Description = *dto.Description
+	}
+	if dto.ISBN != nil {
+		book.ISBN = *dto.ISBN
+	}
+	if dto.Price != nil {
+		book.Price = *dto.Price
+	}
+	if dto.AuthorID != nil {
+		book.AuthorID = *dto.AuthorID
+	}
+}
+
+// ToModel creates a new model from the DTO
+func (dto *BookDTO) ToModel() models.Book {
+	book := models.Book{}
+	dto.ApplyToModel(&book)
+	return book
 }
 
 // Register routes for the books module
@@ -35,8 +82,8 @@ func RegisterBookRoutes(r *gin.RouterGroup) {
 // @Success 200 {array} models.Book
 // @Router /admin/books [get]
 func (b *BooksController) listBooksHandler(c *gin.Context) {
-	limit, _ := strconv.Atoi(c.Query("limit"))
-	offset, _ := strconv.Atoi(c.Query("offset"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
 	var books []models.Book
 	b.db.List(&books, limit, offset)
@@ -49,17 +96,18 @@ func (b *BooksController) listBooksHandler(c *gin.Context) {
 // @Tags books admin
 // @Accept json
 // @Produce json
-// @Param book body models.Book true "Book to create"
+// @Param book body BookDTO true "Book to create"
 // @Success 201 {object} models.Book
 // @Failure 400 {string} string
 // @Router /admin/books [post]
 func (b *BooksController) createBookHandler(c *gin.Context) {
-	var book models.Book
-	if err := c.ShouldBindJSON(&book); err != nil {
+	var inputDTO BookDTO
+	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	book := inputDTO.ToModel()
 	b.db.Create(&book)
 	c.JSON(http.StatusCreated, book)
 }
@@ -73,7 +121,12 @@ func (b *BooksController) createBookHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [delete]
 func (b *BooksController) deleteBookHandler(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := utils.GetIDParam(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	var book models.Book
 	if err := b.db.Read(&book, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
@@ -90,26 +143,34 @@ func (b *BooksController) deleteBookHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Book ID"
-// @Param book body models.Book true "Updated book data"
+// @Param book body BookDTO true "Book fields to update"
 // @Success 200 {object} models.Book
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [patch]
 func (b *BooksController) updateBookHandler(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := utils.GetIDParam(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	var book models.Book
 	if err := b.db.Read(&book, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
 
-	var updatedBook models.Book
-	if err := c.ShouldBindJSON(&updatedBook); err != nil {
+	var updateDTO BookDTO
+	// Set the ID to enable partial updates through the required_without=ID validation
+	updateDTO.ID = &id
+
+	if err := c.ShouldBindJSON(&updateDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	book.Title = updatedBook.Title
-	book.AuthorID = updatedBook.AuthorID
+
+	updateDTO.ApplyToModel(&book)
 	b.db.Update(&book)
 	c.JSON(http.StatusOK, book)
 }
