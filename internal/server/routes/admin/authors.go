@@ -3,6 +3,7 @@ package admin
 import (
 	"go-playground/internal/database"
 	"go-playground/internal/database/models"
+	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
 
@@ -12,6 +13,31 @@ import (
 // AuthorsController handles author-related routes
 type AuthorsController struct {
 	db database.Service
+}
+
+// AuthorDTO is used for both create and update operations
+// Using pointers for fields allows us to distinguish between zero values and not provided values
+type AuthorDTO struct {
+	ID        *uint   `json:"id" binding:"-"` // Added ID field for validation purposes
+	FirstName *string `json:"first_name" binding:"required_without=ID"`
+	LastName  *string `json:"last_name" binding:"required_without=ID"`
+}
+
+// ApplyToModel applies the DTO data to a model instance
+func (dto *AuthorDTO) ApplyToModel(author *models.Author) {
+	if dto.FirstName != nil {
+		author.FirstName = *dto.FirstName
+	}
+	if dto.LastName != nil {
+		author.LastName = *dto.LastName
+	}
+}
+
+// ToModel creates a new model from the DTO
+func (dto *AuthorDTO) ToModel() models.Author {
+	author := models.Author{}
+	dto.ApplyToModel(&author)
+	return author
 }
 
 // Register routes for the authors module
@@ -49,17 +75,18 @@ func (controller *AuthorsController) listAuthorsHandler(c *gin.Context) {
 // @Tags authors admin
 // @Accept json
 // @Produce json
-// @Param author body models.Author true "Author to create"
+// @Param author body AuthorDTO true "Author to create"
 // @Success 201 {object} models.Author
 // @Failure 400 {string} string
 // @Router /admin/authors [post]
 func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
-	var author models.Author
-	if err := c.ShouldBindJSON(&author); err != nil {
+	var inputDTO AuthorDTO
+	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	author := inputDTO.ToModel()
 	controller.db.Create(&author)
 
 	c.JSON(http.StatusCreated, author)
@@ -74,18 +101,19 @@ func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [delete]
 func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	var author models.Author
-	if err := controller.db.Read(&author, uint(id)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+	id, err := utils.GetIDParam(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	controller.db.Delete(&author, uint(id))
-	c.JSON(http.StatusNoContent, nil)
+	var author models.Author
+	if err := controller.db.Read(&author, id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
+		return
+	}
 
-	controller.db.Delete(&models.Book{}, uint(id))
-
+	controller.db.Delete(&author, id)
 	c.Status(http.StatusNoContent)
 }
 
@@ -95,24 +123,34 @@ func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Author ID"
-// @Param author body models.Author true "Updated author data"
+// @Param author body AuthorDTO true "Updated author data"
 // @Success 200 {object} models.Author
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [patch]
 func (controller *AuthorsController) updateAuthorHandler(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	var author models.Author
-	if err := controller.db.Read(&author, uint(id)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
-		return
-	}
-
-	if err := c.ShouldBindJSON(&author); err != nil {
+	id, err := utils.GetIDParam(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	var author models.Author
+	if err := controller.db.Read(&author, id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
+		return
+	}
+
+	var updateDTO AuthorDTO
+	// Set the ID to enable partial updates through the required_without=ID validation
+	updateDTO.ID = &id
+
+	if err := c.ShouldBindJSON(&updateDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updateDTO.ApplyToModel(&author)
 	controller.db.Update(&author)
 	c.JSON(http.StatusOK, author)
 }

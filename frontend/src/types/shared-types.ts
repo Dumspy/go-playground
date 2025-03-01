@@ -55,7 +55,7 @@ export interface paths {
             /** @description Author to create */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["go-playground_internal_database_models.Author"];
+                    "application/json": components["schemas"]["internal_server_routes_admin.AuthorDTO"];
                 };
             };
             responses: {
@@ -148,7 +148,7 @@ export interface paths {
             /** @description Updated author data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["go-playground_internal_database_models.Author"];
+                    "application/json": components["schemas"]["internal_server_routes_admin.AuthorDTO"];
                 };
             };
             responses: {
@@ -716,6 +716,12 @@ export interface components {
             Time?: string;
             /** @description Valid is true if Time is not NULL */
             Valid?: boolean;
+        };
+        "internal_server_routes_admin.AuthorDTO": {
+            first_name?: string;
+            /** @description Added ID field for validation purposes */
+            id?: number;
+            last_name?: string;
         };
         "internal_server_routes_admin.BookDTO": {
             author_id?: number;
