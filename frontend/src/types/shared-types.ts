@@ -234,7 +234,7 @@ export interface paths {
             /** @description Book to create */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
+                    "application/json": components["schemas"]["internal_server_routes_admin.BookDTO"];
                 };
             };
             responses: {
@@ -324,10 +324,10 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            /** @description Updated book data */
+            /** @description Book fields to update */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
+                    "application/json": components["schemas"]["internal_server_routes_admin.BookDTO"];
                 };
             };
             responses: {
@@ -567,62 +567,7 @@ export interface paths {
             };
         };
         put?: never;
-        /**
-         * Create book
-         * @description Create a new book with a valid author
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Book input object */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["go-playground_internal_server_types.CreateBookInput"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
-                    };
-                };
-                /** @description Invalid request or missing author */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": string;
-                    };
-                };
-                /** @description Author not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": string;
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": string;
-                    };
-                };
-            };
-        };
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -745,11 +690,6 @@ export interface components {
             books?: components["schemas"]["go-playground_internal_database_models.Book"][];
             name: string;
         };
-        "go-playground_internal_server_types.CreateBookInput": {
-            author_id: number;
-            published_date: string;
-            title: string;
-        };
         "go-playground_internal_server_types.ListAuthorResponse": {
             first_name?: string;
             id?: number;
@@ -776,6 +716,17 @@ export interface components {
             Time?: string;
             /** @description Valid is true if Time is not NULL */
             Valid?: boolean;
+        };
+        "internal_server_routes_admin.BookDTO": {
+            author_id?: number;
+            description?: string;
+            /** @description Added ID field for validation purposes */
+            id?: number;
+            isbn?: string;
+            pages?: number;
+            price?: number;
+            published_date?: string;
+            title?: string;
         };
         "sql.NullString": {
             String?: string;

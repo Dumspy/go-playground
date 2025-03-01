@@ -7,6 +7,7 @@ import { useNavigate } from '@tanstack/react-router'
 // Define tab values and labels first
 const tabDefinitions = [
   { value: 'authors', label: 'Authors', component: React.lazy(() => import('@/components/admin/dashboard/tabs/authors')) },
+  { value: 'books', label: 'Books', component: React.lazy(() => import('@/components/admin/dashboard/tabs/books')) },
 ];
 
 // Use the definitions for schema validation
