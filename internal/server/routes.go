@@ -23,8 +23,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
-	// r.Use(cors.Default())
-
 	r.GET("/health", s.healthHandler)
 
 	api := r.Group("/api/v1")
