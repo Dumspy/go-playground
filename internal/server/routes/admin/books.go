@@ -81,6 +81,7 @@ func RegisterBookRoutes(r *gin.RouterGroup) {
 // @Param offset query int false "Offset for pagination"
 // @Success 200 {array} models.Book
 // @Router /admin/books [get]
+// @Authorize Bearer
 func (b *BooksController) listBooksHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
@@ -100,6 +101,7 @@ func (b *BooksController) listBooksHandler(c *gin.Context) {
 // @Success 201 {object} models.Book
 // @Failure 400 {string} string
 // @Router /admin/books [post]
+// @Authorize Bearer
 func (b *BooksController) createBookHandler(c *gin.Context) {
 	var inputDTO BookDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
@@ -120,6 +122,7 @@ func (b *BooksController) createBookHandler(c *gin.Context) {
 // @Success 204
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [delete]
+// @Authorize Bearer
 func (b *BooksController) deleteBookHandler(c *gin.Context) {
 	id, err := utils.GetIDParam(c)
 	if err != nil {
@@ -148,6 +151,7 @@ func (b *BooksController) deleteBookHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [patch]
+// @Authorize Bearer
 func (b *BooksController) updateBookHandler(c *gin.Context) {
 	id, err := utils.GetIDParam(c)
 	if err != nil {

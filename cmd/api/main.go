@@ -4,6 +4,9 @@ package main
 // @version 1
 // @description This is a sample server Go Playground server.
 // @servers.url /api/v1
+// @securityDefinitions.bearer BearerAuth
+// @bearerFormat JWT
+// @security BearerAuth
 
 import (
 	"context"

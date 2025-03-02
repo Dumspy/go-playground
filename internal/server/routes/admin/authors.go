@@ -60,6 +60,7 @@ func RegisterAuthorRoutes(r *gin.RouterGroup) {
 // @Param offset query int false "Offset for pagination"
 // @Success 200 {array} models.Author
 // @Router /admin/authors [get]
+// @Authorize Bearer
 func (controller *AuthorsController) listAuthorsHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
@@ -79,6 +80,7 @@ func (controller *AuthorsController) listAuthorsHandler(c *gin.Context) {
 // @Success 201 {object} models.Author
 // @Failure 400 {string} string
 // @Router /admin/authors [post]
+// @Authorize Bearer
 func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
 	var inputDTO AuthorDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
@@ -100,6 +102,7 @@ func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
 // @Success 204
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [delete]
+// @Authorize Bearer
 func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
 	id, err := utils.GetIDParam(c)
 	if err != nil {
@@ -128,6 +131,7 @@ func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [patch]
+// @Authorize Bearer
 func (controller *AuthorsController) updateAuthorHandler(c *gin.Context) {
 	id, err := utils.GetIDParam(c)
 	if err != nil {

@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { 
   Sheet, 
@@ -15,7 +15,8 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { Menu, Book, LogIn } from "lucide-react"
+import { Menu, Book, LogIn, LayoutDashboard, LogOut } from "lucide-react"
+import { useAuth } from "@/context/auth"
 
 const items = {
   home: {
@@ -37,6 +38,9 @@ const items = {
 }
 
 export default function NavHeader() {
+  const { logout, isAuthenticated } = useAuth()
+  const { navigate } = useRouter()
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:border-gray-800 dark:bg-gray-950">
       <div className="container mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
@@ -68,13 +72,37 @@ export default function NavHeader() {
         {/* Right section - Login button and mobile menu */}
         <div className="flex items-center gap-2">
           {/* Login Button */}
-          <Link
-            to="/admin/dashboard"
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            <LogIn className="mr-2 h-4 w-4" />
-            <span className="hidden md:inline">Login</span>
-          </Link>
+          { isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/admin/dashboard"
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">Dashboard</span>
+              </Link>
+              <Button 
+                onClick={() => {
+                  logout()
+                  navigate({ to: '/' })
+                }}
+                variant={"outline"}
+                size={"sm"}
+                >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">Logout</span>
+              </Button>
+            </div>
+          ) : (
+
+              <Link
+              to="/auth/login"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+              <LogIn className="mr-2 h-4 w-4" />
+              <span className="hidden md:inline">Login</span>
+            </Link>
+          )}
           
           {/* Mobile Navigation */}
           <Sheet>

@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sv-tools/openapi v0.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

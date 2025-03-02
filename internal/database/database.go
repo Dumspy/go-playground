@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"go-playground/internal/database/models"
+	"go-playground/internal/server/utils"
 
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/sqlite"
@@ -36,6 +37,8 @@ type Service interface {
 
 	ListBooks(limit int, offset int) ([]models.Book, error)
 	GetBook(id uint) (*models.Book, error)
+
+	GetUser(username string) (*models.User, error)
 }
 
 type service struct {
@@ -61,7 +64,21 @@ func New() Service {
 	}
 
 	// AutoMigrate the models to create the table if it doesn't exist
-	err = db.AutoMigrate(&models.Author{}, &models.Artist{}, &models.Book{}, &models.Cover{})
+	err = db.AutoMigrate(&models.Author{}, &models.Artist{}, &models.Book{}, &models.Cover{}, &models.User{}, &models.Genre{})
+
+	// Seed the database with an admin user if it doesn't exist
+	var user models.User
+	if err := db.Where("username = ?", "admin").First(&user).Error; err != nil {
+		password, err := utils.HashPassword("admin")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if err := db.Create(&models.User{Username: "admin", Password: password}).Error; err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -228,4 +245,12 @@ func (s *service) GetBook(id uint) (*models.Book, error) {
 		return nil, err
 	}
 	return &book, nil
+}
+
+func (s *service) GetUser(username string) (*models.User, error) {
+	var user models.User
+	if err := s.db.Where("username = ?", username).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

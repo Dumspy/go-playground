@@ -17,6 +17,7 @@ import { Route as BooksIndexImport } from './routes/books/index'
 import { Route as AuthorsIndexImport } from './routes/authors/index'
 import { Route as BooksBookIdImport } from './routes/books/$bookId'
 import { Route as AuthorsAuthorIdImport } from './routes/authors/$authorId'
+import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 
 // Create/Update Routes
@@ -57,6 +58,12 @@ const AuthorsAuthorIdRoute = AuthorsAuthorIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AuthLoginRoute = AuthLoginImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AdminDashboardRoute = AdminDashboardImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -86,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginImport
       parentRoute: typeof rootRoute
     }
     '/authors/$authorId': {
@@ -125,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
@@ -135,6 +150,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors': typeof AuthorsIndexRoute
@@ -146,6 +162,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
   '/authors/': typeof AuthorsIndexRoute
@@ -158,6 +175,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin/dashboard'
+    | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors'
@@ -167,6 +185,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin/dashboard'
+    | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors'
@@ -176,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin/dashboard'
+    | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
     | '/authors/'
@@ -187,6 +207,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AuthLoginRoute: typeof AuthLoginRoute
   AuthorsAuthorIdRoute: typeof AuthorsAuthorIdRoute
   BooksBookIdRoute: typeof BooksBookIdRoute
   AuthorsIndexRoute: typeof AuthorsIndexRoute
@@ -197,6 +218,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AuthLoginRoute: AuthLoginRoute,
   AuthorsAuthorIdRoute: AuthorsAuthorIdRoute,
   BooksBookIdRoute: BooksBookIdRoute,
   AuthorsIndexRoute: AuthorsIndexRoute,
@@ -216,6 +238,7 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/admin/dashboard",
+        "/auth/login",
         "/authors/$authorId",
         "/books/$bookId",
         "/authors/",
@@ -230,6 +253,9 @@ export const routeTree = rootRoute
     },
     "/admin/dashboard": {
       "filePath": "admin/dashboard.tsx"
+    },
+    "/auth/login": {
+      "filePath": "auth/login.tsx"
     },
     "/authors/$authorId": {
       "filePath": "authors/$authorId.tsx"

@@ -1,8 +1,9 @@
 import React from "react"
-import createFetchClient from "openapi-fetch";
 import createClient from "openapi-react-query";
 import type { paths } from "@/types/shared-types";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "./auth";
+import { createApiClient } from "@/lib/api";
 
 interface ApiContextValue {
   api: ReturnType<typeof createClient<paths>>
@@ -12,18 +13,14 @@ interface ApiContextValue {
 export const ApiContext = React.createContext<ApiContextValue | undefined>(undefined)
 
 export function ApiContextProvider({ children }: { children: React.ReactNode }) {
-  const tanClient = useQueryClient()
-  const api = React.useMemo(() => {
-    const fetchClient = createFetchClient<paths>({
-      baseUrl: "http://localhost:8080/api/v1",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+  const { getToken } = useAuth()
 
+  const tanClient = useQueryClient()
+  
+  const api = React.useMemo(() => {
+    const fetchClient = createApiClient(getToken)
     return createClient(fetchClient)
-  }, [])
+  }, [getToken])
 
   return (
     <ApiContext.Provider value={{ api, tanClient }}>
