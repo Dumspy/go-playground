@@ -33,7 +33,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		authors := api.Group("/authors")
 		{
 			authors.GET("", s.listAuthorsHandler)
-			authors.POST("", s.createAuthorHandler)
 			authors.GET("/:id", s.getAuthorHandler)
 		}
 
@@ -41,6 +40,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 		{
 			books.GET("", s.listBooksHandler)
 			books.GET("/:id", s.getBookHandler)
+		}
+
+		artists := api.Group("/artists")
+		{
+			artists.GET("", s.ListArtistsHandler)
+			artists.GET("/:id", s.GetArtistHandler)
 		}
 
 		auth := api.Group("/auth")
@@ -116,32 +121,6 @@ func (s *Server) listAuthorsHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
-}
-
-// Authors
-// @Summary Create author
-// @Description Create a new author
-// @Tags authors
-// @Accept json
-// @Produce json
-// @Param author body models.Author true "Author object"
-// @Success 201 {object} models.Author
-// @Failure 400 {object} string
-// @Failure 500 {object} string
-// @Router /authors [post]
-func (s *Server) createAuthorHandler(c *gin.Context) {
-	var author models.Author
-	if err := c.ShouldBindJSON(&author); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := s.db.Create(&author); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, author)
 }
 
 // Authors
@@ -244,4 +223,75 @@ func (s *Server) getBookHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, book)
+}
+
+// Artists
+// @Summary List artists
+// @Description List all artists
+// @Tags artists
+// @Produce json
+// @Param limit query int false "Limit"
+// @Param offset query int false "Offset"
+// @Success 200 {array} types.ListArtistResponse
+// @Failure 500 {string} string
+// @Router /artists [get]
+func (s *Server) ListArtistsHandler(c *gin.Context) {
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit format"})
+		return
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset format"})
+		return
+	}
+
+	var artists []models.Artist
+	if err := s.db.List(&artists, limit, offset); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var response []types.ListArtistResponse
+	for _, author := range artists {
+		response = append(response, types.ListArtistResponse{
+			ID:        author.ID,
+			FirstName: author.FirstName,
+			LastName:  author.LastName,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// Artists
+// @Summary Get artist
+// @Description Get artist by ID
+// @Tags artists
+// @Produce json
+// @Param id path int true "Artist ID"
+// @Success 200 {object} models.Artist
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /artists/{id} [get]
+func (s *Server) GetArtistHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	author, err := s.db.GetArtist(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, author)
 }

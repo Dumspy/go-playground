@@ -720,6 +720,119 @@ export interface paths {
         };
         trace?: never;
     };
+    "/artists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List artists
+         * @description List all artists
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Limit */
+                    limit?: number;
+                    /** @description Offset */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_server_types.ListArtistResponse"][];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artists/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get artist
+         * @description Get artist by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Artist ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Artist"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -873,53 +986,7 @@ export interface paths {
             };
         };
         put?: never;
-        /**
-         * Create author
-         * @description Create a new author
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Author object */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["go-playground_internal_database_models.Author"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["go-playground_internal_database_models.Author"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": string;
-                    };
-                };
-                /** @description Internal Server Error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": string;
-                    };
-                };
-            };
-        };
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1144,6 +1211,7 @@ export interface components {
             DeletedAt?: components["schemas"]["gorm.DeletedAt"];
             ID?: number;
             UpdatedAt?: string;
+            book?: components["schemas"]["go-playground_internal_database_models.Book"];
             book_id: number;
             design_ideas: components["schemas"]["sql.NullString"];
             image_url?: components["schemas"]["sql.NullString"];
@@ -1155,6 +1223,11 @@ export interface components {
             UpdatedAt?: string;
             books?: components["schemas"]["go-playground_internal_database_models.Book"][];
             name: string;
+        };
+        "go-playground_internal_server_types.ListArtistResponse": {
+            first_name?: string;
+            id?: number;
+            last_name?: string;
         };
         "go-playground_internal_server_types.ListAuthorResponse": {
             first_name?: string;

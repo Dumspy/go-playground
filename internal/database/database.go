@@ -38,6 +38,8 @@ type Service interface {
 	ListBooks(limit int, offset int) ([]models.Book, error)
 	GetBook(id uint) (*models.Book, error)
 
+	GetArtist(id uint) (*models.Artist, error)
+
 	GetUser(username string) (*models.User, error)
 
 	ListCovers(limit int, offset int) ([]models.Cover, error)
@@ -263,4 +265,12 @@ func (s *service) ListCovers(limit int, offset int) ([]models.Cover, error) {
 		return nil, err
 	}
 	return covers, nil
+}
+
+func (s *service) GetArtist(id uint) (*models.Artist, error) {
+	var artist models.Artist
+	if err := s.db.Preload("Covers").Preload("Covers.Book").First(&artist, id).Error; err != nil {
+		return nil, err
+	}
+	return &artist, nil
 }

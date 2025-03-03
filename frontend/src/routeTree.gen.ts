@@ -14,9 +14,11 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as BooksIndexImport } from './routes/books/index'
 import { Route as AuthorsIndexImport } from './routes/authors/index'
+import { Route as ArtistsIndexImport } from './routes/artists/index'
 import { Route as BooksBookIdImport } from './routes/books/$bookId'
 import { Route as AuthorsAuthorIdImport } from './routes/authors/$authorId'
 import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as ArtistsArtistIdImport } from './routes/artists/$artistId'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 
 // Create/Update Routes
@@ -39,6 +41,12 @@ const AuthorsIndexRoute = AuthorsIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ArtistsIndexRoute = ArtistsIndexImport.update({
+  id: '/artists/',
+  path: '/artists/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const BooksBookIdRoute = BooksBookIdImport.update({
   id: '/books/$bookId',
   path: '/books/$bookId',
@@ -54,6 +62,12 @@ const AuthorsAuthorIdRoute = AuthorsAuthorIdImport.update({
 const AuthLoginRoute = AuthLoginImport.update({
   id: '/auth/login',
   path: '/auth/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ArtistsArtistIdRoute = ArtistsArtistIdImport.update({
+  id: '/artists/$artistId',
+  path: '/artists/$artistId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardImport
       parentRoute: typeof rootRoute
     }
+    '/artists/$artistId': {
+      id: '/artists/$artistId'
+      path: '/artists/$artistId'
+      fullPath: '/artists/$artistId'
+      preLoaderRoute: typeof ArtistsArtistIdImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -100,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/books/$bookId'
       fullPath: '/books/$bookId'
       preLoaderRoute: typeof BooksBookIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/artists/': {
+      id: '/artists/'
+      path: '/artists'
+      fullPath: '/artists'
+      preLoaderRoute: typeof ArtistsIndexImport
       parentRoute: typeof rootRoute
     }
     '/authors/': {
@@ -124,9 +152,11 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/artists/$artistId': typeof ArtistsArtistIdRoute
   '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
+  '/artists': typeof ArtistsIndexRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
 }
@@ -134,9 +164,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/artists/$artistId': typeof ArtistsArtistIdRoute
   '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
+  '/artists': typeof ArtistsIndexRoute
   '/authors': typeof AuthorsIndexRoute
   '/books': typeof BooksIndexRoute
 }
@@ -145,9 +177,11 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/artists/$artistId': typeof ArtistsArtistIdRoute
   '/auth/login': typeof AuthLoginRoute
   '/authors/$authorId': typeof AuthorsAuthorIdRoute
   '/books/$bookId': typeof BooksBookIdRoute
+  '/artists/': typeof ArtistsIndexRoute
   '/authors/': typeof AuthorsIndexRoute
   '/books/': typeof BooksIndexRoute
 }
@@ -157,27 +191,33 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin/dashboard'
+    | '/artists/$artistId'
     | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
+    | '/artists'
     | '/authors'
     | '/books'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin/dashboard'
+    | '/artists/$artistId'
     | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
+    | '/artists'
     | '/authors'
     | '/books'
   id:
     | '__root__'
     | '/'
     | '/admin/dashboard'
+    | '/artists/$artistId'
     | '/auth/login'
     | '/authors/$authorId'
     | '/books/$bookId'
+    | '/artists/'
     | '/authors/'
     | '/books/'
   fileRoutesById: FileRoutesById
@@ -186,9 +226,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  ArtistsArtistIdRoute: typeof ArtistsArtistIdRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthorsAuthorIdRoute: typeof AuthorsAuthorIdRoute
   BooksBookIdRoute: typeof BooksBookIdRoute
+  ArtistsIndexRoute: typeof ArtistsIndexRoute
   AuthorsIndexRoute: typeof AuthorsIndexRoute
   BooksIndexRoute: typeof BooksIndexRoute
 }
@@ -196,9 +238,11 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  ArtistsArtistIdRoute: ArtistsArtistIdRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthorsAuthorIdRoute: AuthorsAuthorIdRoute,
   BooksBookIdRoute: BooksBookIdRoute,
+  ArtistsIndexRoute: ArtistsIndexRoute,
   AuthorsIndexRoute: AuthorsIndexRoute,
   BooksIndexRoute: BooksIndexRoute,
 }
@@ -215,9 +259,11 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/admin/dashboard",
+        "/artists/$artistId",
         "/auth/login",
         "/authors/$authorId",
         "/books/$bookId",
+        "/artists/",
         "/authors/",
         "/books/"
       ]
@@ -228,6 +274,9 @@ export const routeTree = rootRoute
     "/admin/dashboard": {
       "filePath": "admin/dashboard.tsx"
     },
+    "/artists/$artistId": {
+      "filePath": "artists/$artistId.tsx"
+    },
     "/auth/login": {
       "filePath": "auth/login.tsx"
     },
@@ -236,6 +285,9 @@ export const routeTree = rootRoute
     },
     "/books/$bookId": {
       "filePath": "books/$bookId.tsx"
+    },
+    "/artists/": {
+      "filePath": "artists/index.tsx"
     },
     "/authors/": {
       "filePath": "authors/index.tsx"
