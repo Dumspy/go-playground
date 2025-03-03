@@ -6,7 +6,7 @@ import { useNavigate } from '@tanstack/react-router'
 
 // Define tab values and labels first
 const tabDefinitions = [
-  { value: 'authors', label: 'Authors', component: React.lazy(() => import('@/components/admin/dashboard/tabs/authors')) },
+  { value: 'authors', label: 'Authors', component: React.lazy(() => import('@/components/admin/dashboard/tabs/authors/tab')) },
   { value: 'artists', label: 'Artists', component: React.lazy(() => import('@/components/admin/dashboard/tabs/artists')) },
   { value: 'books', label: 'Books', component: React.lazy(() => import('@/components/admin/dashboard/tabs/books')) },
   { value: 'covers', label: 'Covers', component: React.lazy(() => import('@/components/admin/dashboard/tabs/covers')) },

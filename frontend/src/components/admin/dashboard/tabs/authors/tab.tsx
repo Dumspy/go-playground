@@ -10,14 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,20 +37,11 @@ import {
 import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner"
 import { components } from "@/types/shared-types"
-import TableLoading from "./table-loading";
+import TableLoading from "../table-loading";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { DialogDescription } from "@radix-ui/react-dialog";
+import AuthorForm from "./form";
 
 // Define the Author type based on the model
 type Author = components["schemas"]["go-playground_internal_database_models.Author"]
@@ -71,10 +54,10 @@ const formSchema = z.object({
 const AuthorsTab: React.FC = () => {
   const { api, tanClient } = useApi();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [selectedAuthor, setSelectedAuthor] = React.useState<Author | null>(null);
+  const [selectedAuthor, setSelectedAuthor] = React.useState<Author | undefined>(undefined);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = React.useState(false);
+  const [formVariant, setFormVariant] = React.useState<"create" | "edit">("create");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +77,7 @@ const AuthorsTab: React.FC = () => {
   const createAuthorMutation = api.useMutation('post', "/admin/authors", {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
-      setIsCreateDialogOpen(false);
+      setIsFormDialogOpen(false);
       const formData = form.getValues();
       toast("Author created", {
         description: `${formData.first_name} ${formData.last_name} has been added successfully.`,
@@ -125,7 +108,7 @@ const AuthorsTab: React.FC = () => {
   const updateAuthorMutation = api.useMutation('patch', "/admin/authors/{id}", {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/authors"] });
-      setIsEditDialogOpen(false);
+      setIsFormDialogOpen(false);
       const formData = form.getValues();
       toast("Author updated", {
         description: `${formData.first_name} ${formData.last_name} has been updated successfully.`,
@@ -186,7 +169,8 @@ const AuthorsTab: React.FC = () => {
                   setSelectedAuthor(author);
                   form.setValue("first_name", author.first_name);
                   form.setValue("last_name", author.last_name);
-                  setIsEditDialogOpen(true);
+                  setFormVariant("edit");
+                  setIsFormDialogOpen(true);
                 }}
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -263,7 +247,8 @@ const AuthorsTab: React.FC = () => {
         <h2 className="text-2xl font-bold">Authors</h2>
         <Button onClick={() => {
           form.reset();
-          setIsCreateDialogOpen(true);
+          setFormVariant("create");
+          setIsFormDialogOpen(true);
         }}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Author
@@ -332,91 +317,8 @@ const AuthorsTab: React.FC = () => {
         </Button>
       </div>
 
-      {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Author</DialogTitle>
-            <DialogDescription>
-              Please fill in the details to create a new author.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleCreate)} className="grid gap-4 py-4">
-                <FormField control={form.control} name="first_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="first_name">First Name</FormLabel>
-                    <FormControl>
-                      <Input id="first_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the author's first name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="last_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="last_name">Last name</FormLabel>
-                    <FormControl>
-                      <Input id="last_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the author's last name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              <DialogFooter>
-                <Button type="submit">Create</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Author</DialogTitle>
-            <DialogDescription>
-              Please update the details to edit the author.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleUpdate)} className="grid gap-4 py-4">
-                <FormField control={form.control} name="first_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="first_name">First Name</FormLabel>
-                    <FormControl>
-                      <Input id="first_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the author's first name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="last_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="last_name">Last name</FormLabel>
-                    <FormControl>
-                      <Input id="last_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the author's last name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              <DialogFooter>
-                <Button type="submit">Update</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {/* Create/Edit Dialog */}
+      <AuthorForm variant={formVariant} author={selectedAuthor} onSubmit={formVariant === "create" ? handleCreate : handleUpdate} isOpen={isFormDialogOpen} setIsOpen={setIsFormDialogOpen}/>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
