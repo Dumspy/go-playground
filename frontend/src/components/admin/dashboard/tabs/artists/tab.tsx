@@ -10,14 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,20 +37,11 @@ import {
 import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner"
 import { components } from "@/types/shared-types"
-import TableLoading from "./table-loading";
+import TableLoading from "../table-loading";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { DialogDescription } from "@radix-ui/react-dialog";
+import ArtistForm from "./form";
 
 // Define the Artist type based on the model
 type Artist = components["schemas"]["go-playground_internal_database_models.Artist"]
@@ -71,10 +54,10 @@ const formSchema = z.object({
 const ArtistsTab: React.FC = () => {
   const { api, tanClient } = useApi();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [selectedArtist, setSelectedArtist] = React.useState<Artist | null>(null);
+  const [selectedArtist, setSelectedArtist] = React.useState<Artist | undefined>(undefined);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = React.useState(false);
+  const [formVariant, setFormVariant] = React.useState<"create" | "edit">("create");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +77,7 @@ const ArtistsTab: React.FC = () => {
   const createArtistMutation = api.useMutation('post', "/admin/artists", {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/artists"] });
-      setIsCreateDialogOpen(false);
+      setIsFormDialogOpen(false);
       const formData = form.getValues();
       toast("Artist created", {
         description: `${formData.first_name} ${formData.last_name} has been added successfully.`,
@@ -125,7 +108,7 @@ const ArtistsTab: React.FC = () => {
   const updateArtistMutation = api.useMutation('patch', "/admin/artists/{id}", {
     onSuccess: () => {
       tanClient.invalidateQueries({ queryKey: ['get', "/admin/artists"] });
-      setIsEditDialogOpen(false);
+      setIsFormDialogOpen(false);
       const formData = form.getValues();
       toast("Artist updated", {
         description: `${formData.first_name} ${formData.last_name} has been updated successfully.`,
@@ -186,7 +169,8 @@ const ArtistsTab: React.FC = () => {
                   setSelectedArtist(artist);
                   form.setValue("first_name", artist.first_name);
                   form.setValue("last_name", artist.last_name);
-                  setIsEditDialogOpen(true);
+                  setFormVariant("edit");
+                  setIsFormDialogOpen(true);
                 }}
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -263,7 +247,8 @@ const ArtistsTab: React.FC = () => {
         <h2 className="text-2xl font-bold">Artists</h2>
         <Button onClick={() => {
           form.reset();
-          setIsCreateDialogOpen(true);
+          setFormVariant("create");
+          setIsFormDialogOpen(true);
         }}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Artist
@@ -332,91 +317,8 @@ const ArtistsTab: React.FC = () => {
         </Button>
       </div>
 
-      {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Artist</DialogTitle>
-            <DialogDescription>
-              Please fill in the details to create a new artist.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleCreate)} className="grid gap-4 py-4">
-              <FormField control={form.control} name="first_name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="first_name">First Name</FormLabel>
-                  <FormControl>
-                    <Input id="first_name" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Please enter the artist's first name.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="last_name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="last_name">Last name</FormLabel>
-                  <FormControl>
-                    <Input id="last_name" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Please enter the artist's last name.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <DialogFooter>
-                <Button type="submit">Create</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Artist</DialogTitle>
-            <DialogDescription>
-              Please update the details to edit the artist.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleUpdate)} className="grid gap-4 py-4">
-              <FormField control={form.control} name="first_name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="first_name">First Name</FormLabel>
-                  <FormControl>
-                    <Input id="first_name" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Please enter the artist's first name.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="last_name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="last_name">Last name</FormLabel>
-                  <FormControl>
-                    <Input id="last_name" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Please enter the artist's last name.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <DialogFooter>
-                <Button type="submit">Update</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {/* Create/Edit Dialog */}
+      <ArtistForm variant={formVariant} artist={selectedArtist} onSubmit={handleCreate} isOpen={isFormDialogOpen} setIsOpen={setIsFormDialogOpen}/>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
