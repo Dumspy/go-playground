@@ -243,7 +243,7 @@ func (s *service) ListBooks(limit int, offset int) ([]models.Book, error) {
 
 func (s *service) GetBook(id uint) (*models.Book, error) {
 	var book models.Book
-	if err := s.db.Preload("Cover.Artists").Preload("Cover").First(&book, id).Error; err != nil {
+	if err := s.db.Preload("Cover.Artists").Preload("Cover").Preload("Author").First(&book, id).Error; err != nil {
 		return nil, err
 	}
 	return &book, nil

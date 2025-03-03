@@ -101,8 +101,12 @@ function RouteComponent() {
                 </div>
 
                 <div>
-                  <span className="text-muted-foreground">Artist:</span>{' '}
-                  <span className="font-medium">{'Artist tbd'}</span> {/* TODO */}
+                  <span className="text-muted-foreground">Artist{book.Cover?.Artists?.length !== 1 ? 's' : ''}:</span>{' '}
+                  <span className="font-medium">
+                    {book.Cover?.Artists && book.Cover.Artists.length > 0
+                      ? book.Cover.Artists.map(artist => fullName(artist.first_name, artist.last_name)).join(', ')
+                      : 'No artists listed'}
+                  </span>
                 </div>
 
                 {book.published_date && (
