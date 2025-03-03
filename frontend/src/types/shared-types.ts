@@ -1205,6 +1205,7 @@ export interface components {
         "internal_server_routes_admin.BookDTO": {
             author_id?: number;
             description?: string;
+            digital_only?: boolean;
             /** @description Added ID field for validation purposes */
             id?: number;
             isbn?: string;
