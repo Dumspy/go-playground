@@ -56,6 +56,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 			adminAuthors := admin.Group("/authors")
 			adminRoutes.RegisterAuthorRoutes(adminAuthors)
+
+			adminCovers := admin.Group("/covers")
+			adminRoutes.RegisterCoverRoutes(adminCovers)
+
+			adminArtists := admin.Group("/artists")
+			adminRoutes.RegisterArtistRoutes(adminArtists)
 		}
 	}
 

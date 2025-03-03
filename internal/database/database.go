@@ -39,6 +39,8 @@ type Service interface {
 	GetBook(id uint) (*models.Book, error)
 
 	GetUser(username string) (*models.User, error)
+
+	ListCovers(limit int, offset int) ([]models.Cover, error)
 }
 
 type service struct {
@@ -253,4 +255,12 @@ func (s *service) GetUser(username string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (s *service) ListCovers(limit int, offset int) ([]models.Cover, error) {
+	var covers []models.Cover
+	if err := s.db.Preload("Artists").Limit(limit).Offset(offset).Find(&covers).Error; err != nil {
+		return nil, err
+	}
+	return covers, nil
 }

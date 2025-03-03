@@ -4,6 +4,185 @@
  */
 
 export interface paths {
+    "/admin/artists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List artists
+         * @description Get a list of all artists with pagination
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Limit number of artists returned */
+                    limit?: number;
+                    /** @description Offset for pagination */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Artist"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create artist
+         * @description Create a new artist
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Artist to create */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_server_routes_admin.ArtistDTO"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Artist"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/artists/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete artist
+         * @description Delete an artist by ID
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Artist ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Update artist
+         * @description Update an artist by ID
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Artist ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description Artist fields to update */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_server_routes_admin.ArtistDTO"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Artist"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/admin/authors": {
         parameters: {
             query?: never;
@@ -338,6 +517,185 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["go-playground_internal_database_models.Book"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/admin/covers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List covers
+         * @description Get a list of all covers with pagination
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Limit number of covers returned */
+                    limit?: number;
+                    /** @description Offset for pagination */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Cover"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create cover
+         * @description Create a new cover
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Cover to create */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_server_routes_admin.CoverDTO"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Cover"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/covers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete cover
+         * @description Delete a cover by ID
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Cover ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Update cover
+         * @description Update a cover by ID
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Cover ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description Cover fields to update */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_server_routes_admin.CoverDTO"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["go-playground_internal_database_models.Cover"];
                     };
                 };
                 /** @description Bad Request */
@@ -832,6 +1190,12 @@ export interface components {
         "internal_server_routes.LoginResponse": {
             authToken: string;
         };
+        "internal_server_routes_admin.ArtistDTO": {
+            first_name?: string;
+            /** @description Added ID field for validation purposes */
+            id?: number;
+            last_name?: string;
+        };
         "internal_server_routes_admin.AuthorDTO": {
             first_name?: string;
             /** @description Added ID field for validation purposes */
@@ -848,6 +1212,14 @@ export interface components {
             price?: number;
             published_date?: string;
             title?: string;
+        };
+        "internal_server_routes_admin.CoverDTO": {
+            artist_ids?: number[];
+            book_id?: number;
+            design_ideas?: string;
+            /** @description Added ID field for validation purposes */
+            id?: number;
+            image_url?: string;
         };
         "sql.NullString": {
             String?: string;
