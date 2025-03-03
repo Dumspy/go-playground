@@ -1,20 +1,20 @@
-import { Button } from '@/components/ui/button'
-import { createFileRoute } from '@tanstack/react-router'
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import { Button, buttonVariants } from '@/components/ui/button'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
 } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -28,13 +28,13 @@ export const Route = createFileRoute('/')({
 function Index() {
   const { api } = useApi()
 
-  const {data, isLoading, error} = api.useQuery('get', '/books', {
+  const { data, isLoading, error } = api.useQuery('get', '/books', {
     params: {
       query: {
         limit: 6,
       }
     },
-  }) 
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -52,9 +52,9 @@ function Index() {
           </div>
         </div>
       </section>
-      
+
       <Separator className="my-8" />
-      
+
       {/* Featured Books Carousel */}
       <section className="py-12">
         <h2 className="text-3xl font-semibold text-center mb-8">Featured Titles</h2>
@@ -88,24 +88,34 @@ function Index() {
               </CarouselItem>
             ) : (
               // Display actual books data
-              data?.map((book, index) => ( 
+              data?.map((book, index) => (
                 <CarouselItem key={book.id || index} className="md:basis-1/3 lg:basis-1/3">
                   <Card>
                     <CardHeader className="p-0">
                       <div className="aspect-[2/3] bg-slate-200 rounded-t-md">
-                        <img 
+                        <img
                           src={book.Cover?.image_url || 'https://placehold.co/300x450?text=No+Cover'}
-                          alt={book.title} 
+                          alt={book.title}
                           className="w-full h-full object-cover rounded-t-md"
                         />
                       </div>
                     </CardHeader>
                     <CardContent className="pt-4">
                       <CardTitle className="text-lg">{book.title}</CardTitle>
-                      <CardDescription>{fullName(book.Author?.first_name, book.Author?.last_name)}</CardDescription>
+                      <CardDescription>by {fullName(book.Author?.first_name, book.Author?.last_name)}</CardDescription>
                     </CardContent>
                     <CardFooter>
-                      <Button variant="secondary" className="w-full">View Details</Button>
+                      {book?.id ? (
+                        <Link
+                          to="/authors/$authorId"
+                          params={{ authorId: book.id.toString() }}
+                          className={buttonVariants({ variant: "outline", className: "w-full" })}
+                        >
+                          View
+                        </Link>
+                      ) : (
+                        <span className={buttonVariants({ variant: "outline", className: "w-full" })}>No Details</span>
+                      )}
                     </CardFooter>
                   </Card>
                 </CarouselItem>
@@ -116,19 +126,19 @@ function Index() {
           <CarouselNext />
         </Carousel>
       </section>
-            
+
       <Separator className="my-8" />
-      
+
       {/* About Publisher */}
       <section className="py-12 grid md:grid-cols-2 gap-8 items-center">
         <div>
           <h2 className="text-3xl font-semibold mb-4">About Horizon Publishing</h2>
           <p className="text-slate-600 mb-4">
-            Founded in 1995, Horizon Publishing has been dedicated to discovering 
+            Founded in 1995, Horizon Publishing has been dedicated to discovering
             and promoting exceptional literary voices from around the world.
           </p>
           <p className="text-slate-600 mb-4">
-            Our commitment to quality storytelling and beautiful book design has 
+            Our commitment to quality storytelling and beautiful book design has
             established us as a leading independent publisher in the industry.
           </p>
           <Button variant="link" className="p-0">Learn more about our story →</Button>
@@ -137,7 +147,7 @@ function Index() {
           <div className="aspect-video bg-slate-200"></div>
         </Card>
       </section>
-      
+
       {/* Testimonials */}
       <section className="py-12 my-8 bg-slate-50 rounded-xl">
         <h2 className="text-3xl font-semibold text-center mb-8">What Authors Say</h2>
@@ -148,7 +158,7 @@ function Index() {
                 <Card className="mx-4">
                   <CardContent className="pt-6">
                     <p className="text-slate-600 italic mb-4">
-                      "Working with Horizon Publishing was the best decision of my writing career. 
+                      "Working with Horizon Publishing was the best decision of my writing career.
                       Their dedication to quality and author support is unmatched in the industry."
                     </p>
                     <p className="font-semibold">— Author Name {testimonial}</p>
@@ -161,7 +171,7 @@ function Index() {
           <CarouselNext />
         </Carousel>
       </section>
-      
+
       {/* Newsletter */}
       <section className="py-12 bg-slate-900 text-white text-center rounded-xl my-8">
         <Card className="bg-transparent border-none shadow-none text-white">
@@ -173,9 +183,9 @@ function Index() {
           </CardHeader>
           <CardContent>
             <div className="flex w-full max-w-md mx-auto space-x-2">
-              <Input 
-                type="email" 
-                placeholder="Email" 
+              <Input
+                type="email"
+                placeholder="Email"
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
               <Button variant="secondary">Subscribe</Button>
@@ -183,7 +193,7 @@ function Index() {
           </CardContent>
         </Card>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-8 text-center text-slate-600">
         <Separator className="mb-8" />
