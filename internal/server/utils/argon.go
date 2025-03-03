@@ -117,3 +117,15 @@ func VerifyPassword(storedHash, password string) (bool, error) {
 	// Compare the computed hash with the stored hash in constant time
 	return subtle.ConstantTimeCompare(storedKey, computedKey) == 1, nil
 }
+
+func GenerateRefreshToken() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.RawStdEncoding.EncodeToString(b), nil
+}
+
+func VerifyRefreshToken(storedToken, providedToken string) bool {
+	return subtle.ConstantTimeCompare([]byte(storedToken), []byte(providedToken)) == 1
+}

@@ -4,6 +4,7 @@ import (
 	"go-playground/internal/database"
 	"go-playground/internal/server/utils"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,7 @@ func RegisterAuthRoutes(r *gin.RouterGroup) {
 
 	r.POST("/login", controller.loginHandler)
 	r.POST("/logout", controller.logoutHandler)
+	r.POST("/refresh", controller.refreshHandler)
 }
 
 type LoginRequest struct {
@@ -66,6 +68,17 @@ func (controller *AuthController) loginHandler(c *gin.Context) {
 		return
 	}
 
+	user.RefreshToken, err = utils.GenerateRefreshToken()
+	user.ExpriesAt = time.Now().Add(time.Hour * 24 * 7)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate refresh token"})
+		return
+	}
+
+	controller.db.Update(user)
+
+	c.SetCookie("refreshToken", user.RefreshToken, 60*60*24*7, "/", "", true, true)
+
 	c.JSON(http.StatusOK, gin.H{
 		"authToken": token,
 	})
@@ -78,7 +91,47 @@ func (controller *AuthController) loginHandler(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Router /auth/logout [post]
 func (controller *AuthController) logoutHandler(c *gin.Context) {
+	token, err := c.Cookie("refreshToken")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+	// Clear the cookie
+	c.SetCookie("refreshToken", "", -1, "/", "", true, true)
+	// Clear the refresh token in the database
+	controller.db.ClearRefreshToken(token)
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Logout successful",
+	})
+}
+
+// @Summary Refresh token
+// @Description Refresh JWT token
+// @Tags auth
+// @Produce json
+// @Success 200 {object} LoginResponse
+// @Failure 401 {object} map[string]string
+// @Router /auth/refresh [post]
+func (controller *AuthController) refreshHandler(c *gin.Context) {
+	refreshToken, err := c.Cookie("refreshToken")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+	user, err := controller.db.GetUserByRefreshToken(refreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+
+	token, err := utils.GenerateJWT(*user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"authToken": token,
 	})
 }

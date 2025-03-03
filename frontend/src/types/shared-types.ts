@@ -940,6 +940,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh token
+         * @description Refresh JWT token
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_server_routes.LoginResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            [key: string]: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/authors": {
         parameters: {
             query?: never;
@@ -1198,7 +1248,6 @@ export interface components {
             author_id?: number;
             description: string;
             digital_only: boolean;
-            genres?: components["schemas"]["go-playground_internal_database_models.Genre"][];
             isbn: string;
             pages: number;
             price: number;
@@ -1215,14 +1264,6 @@ export interface components {
             book_id: number;
             design_ideas: components["schemas"]["sql.NullString"];
             image_url?: components["schemas"]["sql.NullString"];
-        };
-        "go-playground_internal_database_models.Genre": {
-            CreatedAt?: string;
-            DeletedAt?: components["schemas"]["gorm.DeletedAt"];
-            ID?: number;
-            UpdatedAt?: string;
-            books?: components["schemas"]["go-playground_internal_database_models.Book"][];
-            name: string;
         };
         "go-playground_internal_server_types.ListArtistResponse": {
             first_name?: string;
