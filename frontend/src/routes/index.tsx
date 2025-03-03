@@ -47,8 +47,12 @@ function Index() {
             Bringing exceptional stories to life for readers around the world
           </p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg">Explore Our Books</Button>
-            <Button variant="outline" size="lg">About Us</Button>
+            <Link to="/authors" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              Meet Our Authors
+            </Link>
+            <Link to="/books" className={buttonVariants({ variant: "default", size: "lg" })}>
+              Explore Our Books
+            </Link>
           </div>
         </div>
       </section>
