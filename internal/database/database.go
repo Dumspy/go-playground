@@ -68,7 +68,7 @@ func New() Service {
 	}
 
 	// AutoMigrate the models to create the table if it doesn't exist
-	err = db.AutoMigrate(&models.Author{}, &models.Artist{}, &models.Book{}, &models.Cover{}, &models.User{}, &models.Genre{})
+	err = db.AutoMigrate(&models.Author{}, &models.Artist{}, &models.Book{}, &models.Cover{}, &models.User{})
 
 	// Seed the database with an admin user if it doesn't exist
 	var user models.User
