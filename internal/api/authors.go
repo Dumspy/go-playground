@@ -1,19 +1,12 @@
-package admin
+package api
 
 import (
-	"go-playground/internal/database"
 	"go-playground/internal/database/models"
-	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-// AuthorsController handles author-related routes
-type AuthorsController struct {
-	db database.Service
-}
 
 // AuthorDTO is used for both create and update operations
 // Using pointers for fields allows us to distinguish between zero values and not provided values
@@ -41,15 +34,11 @@ func (dto *AuthorDTO) ToModel() models.Author {
 }
 
 // Register routes for the authors module
-func RegisterAuthorRoutes(r *gin.RouterGroup) {
-	controller := &AuthorsController{
-		db: database.New(),
-	}
-
-	r.GET("", controller.listAuthorsHandler)
-	r.POST("", controller.createAuthorHandler)
-	r.DELETE("/:id", controller.deleteAuthorHandler)
-	r.PATCH("/:id", controller.updateAuthorHandler)
+func (s *Server) RegisterAuthorAdminRoutes(r *gin.RouterGroup) {
+	r.GET("", s.listAuthorsAdminHandler)
+	r.POST("", s.createAuthorHandler)
+	r.DELETE("/:id", s.deleteAuthorHandler)
+	r.PATCH("/:id", s.updateAuthorHandler)
 }
 
 // @Summary List authors
@@ -61,12 +50,12 @@ func RegisterAuthorRoutes(r *gin.RouterGroup) {
 // @Success 200 {array} models.Author
 // @Router /admin/authors [get]
 // @Authorize Bearer
-func (controller *AuthorsController) listAuthorsHandler(c *gin.Context) {
+func (s *Server) listAuthorsAdminHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
 	var authors []models.Author
-	controller.db.List(&authors, limit, offset)
+	s.db.List(&authors, limit, offset)
 
 	c.JSON(http.StatusOK, authors)
 }
@@ -81,7 +70,7 @@ func (controller *AuthorsController) listAuthorsHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Router /admin/authors [post]
 // @Authorize Bearer
-func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
+func (s *Server) createAuthorHandler(c *gin.Context) {
 	var inputDTO AuthorDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -89,7 +78,7 @@ func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
 	}
 
 	author := inputDTO.ToModel()
-	controller.db.Create(&author)
+	s.db.Create(&author)
 
 	c.JSON(http.StatusCreated, author)
 }
@@ -103,20 +92,20 @@ func (controller *AuthorsController) createAuthorHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [delete]
 // @Authorize Bearer
-func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) deleteAuthorHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var author models.Author
-	if err := controller.db.Read(&author, id); err != nil {
+	if err := s.db.Read(&author, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
 		return
 	}
 
-	controller.db.Delete(&author, id)
+	s.db.Delete(&author, id)
 	c.Status(http.StatusNoContent)
 }
 
@@ -132,15 +121,15 @@ func (controller *AuthorsController) deleteAuthorHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/authors/{id} [patch]
 // @Authorize Bearer
-func (controller *AuthorsController) updateAuthorHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) updateAuthorHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var author models.Author
-	if err := controller.db.Read(&author, id); err != nil {
+	if err := s.db.Read(&author, id); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Author not found"})
 		return
 	}
@@ -155,6 +144,6 @@ func (controller *AuthorsController) updateAuthorHandler(c *gin.Context) {
 	}
 
 	updateDTO.ApplyToModel(&author)
-	controller.db.Update(&author)
+	s.db.Update(&author)
 	c.JSON(http.StatusOK, author)
 }

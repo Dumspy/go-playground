@@ -1,9 +1,7 @@
-package admin
+package api
 
 import (
-	"go-playground/internal/database"
 	"go-playground/internal/database/models"
-	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
 
@@ -11,9 +9,6 @@ import (
 )
 
 // CoverController handles cover-related routes
-type CoverController struct {
-	db database.Service
-}
 
 // CoverDTO is used for both create and update operations
 // Using pointers for fields allows us to distinguish between zero values and not provided values
@@ -48,15 +43,11 @@ func (dto *CoverDTO) ToModel() models.Cover {
 }
 
 // Register routes for the books module
-func RegisterCoverRoutes(r *gin.RouterGroup) {
-	controller := &CoverController{
-		db: database.New(),
-	}
-
-	r.GET("", controller.listCoversHandler)
-	r.POST("", controller.createCoverHandler)
-	r.DELETE("/:id", controller.deleteCoverHandler)
-	r.PATCH("/:id", controller.updateCoverHandler)
+func (s *Server) RegisterCoversAdminRoutes(r *gin.RouterGroup) {
+	r.GET("", s.listCoversHandler)
+	r.POST("", s.createCoverHandler)
+	r.DELETE("/:id", s.deleteCoverHandler)
+	r.PATCH("/:id", s.updateCoverHandler)
 }
 
 // @Summary List covers
@@ -68,17 +59,17 @@ func RegisterCoverRoutes(r *gin.RouterGroup) {
 // @Success 200 {array} models.Cover
 // @Router /admin/covers [get]
 // @Authorize Bearer
-func (b *CoverController) listCoversHandler(c *gin.Context) {
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+func (s *Server) listCoversHandler(ctx *gin.Context) {
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	offset, _ := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
 
-	covers, err := b.db.ListCovers(limit, offset)
+	covers, err := s.db.ListCovers(limit, offset)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, covers)
+	ctx.JSON(http.StatusOK, covers)
 }
 
 // @Summary Create cover
@@ -91,7 +82,7 @@ func (b *CoverController) listCoversHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Router /admin/covers [post]
 // @Authorize Bearer
-func (b *CoverController) createCoverHandler(c *gin.Context) {
+func (s *Server) createCoverHandler(c *gin.Context) {
 	var inputDTO CoverDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -105,14 +96,14 @@ func (b *CoverController) createCoverHandler(c *gin.Context) {
 		var artists []*models.Artist
 		for _, artistID := range *inputDTO.ArtistIDs {
 			artist := &models.Artist{}
-			if err := b.db.Read(artist, artistID); err == nil {
+			if err := s.db.Read(artist, artistID); err == nil {
 				artists = append(artists, artist)
 			}
 		}
 		cover.Artists = artists
 	}
 
-	b.db.Create(&cover)
+	s.db.Create(&cover)
 	c.JSON(http.StatusCreated, cover)
 }
 
@@ -125,20 +116,20 @@ func (b *CoverController) createCoverHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/covers/{id} [delete]
 // @Authorize Bearer
-func (b *CoverController) deleteCoverHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) deleteCoverHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cover models.Cover
-	if err := b.db.Read(&cover, uint(id)); err != nil {
+	if err := s.db.Read(&cover, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cover not found"})
 		return
 	}
 
-	b.db.Delete(&cover, uint(id))
+	s.db.Delete(&cover, uint(id))
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -154,15 +145,15 @@ func (b *CoverController) deleteCoverHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/covers/{id} [patch]
 // @Authorize Bearer
-func (b *CoverController) updateCoverHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) updateCoverHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cover models.Cover
-	if err := b.db.Read(&cover, uint(id)); err != nil {
+	if err := s.db.Read(&cover, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cover not found"})
 		return
 	}
@@ -183,13 +174,13 @@ func (b *CoverController) updateCoverHandler(c *gin.Context) {
 		var artists []*models.Artist
 		for _, artistID := range *updateDTO.ArtistIDs {
 			artist := &models.Artist{}
-			if err := b.db.Read(artist, artistID); err == nil {
+			if err := s.db.Read(artist, artistID); err == nil {
 				artists = append(artists, artist)
 			}
 		}
 		cover.Artists = artists
 	}
 
-	b.db.Update(&cover)
+	s.db.Update(&cover)
 	c.JSON(http.StatusOK, cover)
 }

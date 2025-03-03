@@ -1,20 +1,13 @@
-package admin
+package api
 
 import (
-	"go-playground/internal/database"
 	"go-playground/internal/database/models"
-	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
-
-// BooksController handles book-related routes
-type BooksController struct {
-	db database.Service
-}
 
 // BookDTO is used for both create and update operations
 // Using pointers for fields allows us to distinguish between zero values and not provided values
@@ -66,15 +59,11 @@ func (dto *BookDTO) ToModel() models.Book {
 }
 
 // Register routes for the books module
-func RegisterBookRoutes(r *gin.RouterGroup) {
-	controller := &BooksController{
-		db: database.New(),
-	}
-
-	r.GET("", controller.listBooksHandler)
-	r.POST("", controller.createBookHandler)
-	r.DELETE("/:id", controller.deleteBookHandler)
-	r.PATCH("/:id", controller.updateBookHandler)
+func (s *Server) RegisterBooksAdminRoutes(r *gin.RouterGroup) {
+	r.GET("", s.listBooksAdminHandler)
+	r.POST("", s.createBookHandler)
+	r.DELETE("/:id", s.deleteBookHandler)
+	r.PATCH("/:id", s.updateBookHandler)
 }
 
 // @Summary List books
@@ -86,12 +75,12 @@ func RegisterBookRoutes(r *gin.RouterGroup) {
 // @Success 200 {array} models.Book
 // @Router /admin/books [get]
 // @Authorize Bearer
-func (b *BooksController) listBooksHandler(c *gin.Context) {
+func (s *Server) listBooksAdminHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
 	var books []models.Book
-	b.db.List(&books, limit, offset)
+	s.db.List(&books, limit, offset)
 
 	c.JSON(http.StatusOK, books)
 }
@@ -106,7 +95,7 @@ func (b *BooksController) listBooksHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Router /admin/books [post]
 // @Authorize Bearer
-func (b *BooksController) createBookHandler(c *gin.Context) {
+func (s *Server) createBookHandler(c *gin.Context) {
 	var inputDTO BookDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -114,7 +103,7 @@ func (b *BooksController) createBookHandler(c *gin.Context) {
 	}
 
 	book := inputDTO.ToModel()
-	b.db.Create(&book)
+	s.db.Create(&book)
 	c.JSON(http.StatusCreated, book)
 }
 
@@ -127,20 +116,20 @@ func (b *BooksController) createBookHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [delete]
 // @Authorize Bearer
-func (b *BooksController) deleteBookHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) deleteBookHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var book models.Book
-	if err := b.db.Read(&book, uint(id)); err != nil {
+	if err := s.db.Read(&book, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
 
-	b.db.Delete(&book, uint(id))
+	s.db.Delete(&book, uint(id))
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -156,15 +145,15 @@ func (b *BooksController) deleteBookHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/books/{id} [patch]
 // @Authorize Bearer
-func (b *BooksController) updateBookHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) updateBookHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var book models.Book
-	if err := b.db.Read(&book, uint(id)); err != nil {
+	if err := s.db.Read(&book, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
@@ -179,6 +168,6 @@ func (b *BooksController) updateBookHandler(c *gin.Context) {
 	}
 
 	updateDTO.ApplyToModel(&book)
-	b.db.Update(&book)
+	s.db.Update(&book)
 	c.JSON(http.StatusOK, book)
 }

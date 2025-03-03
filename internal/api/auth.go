@@ -1,8 +1,8 @@
-package routes
+package api
 
 import (
 	"go-playground/internal/database"
-	"go-playground/internal/server/utils"
+	"go-playground/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

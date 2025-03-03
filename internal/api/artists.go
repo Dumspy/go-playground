@@ -1,19 +1,12 @@
-package admin
+package api
 
 import (
-	"go-playground/internal/database"
 	"go-playground/internal/database/models"
-	"go-playground/internal/server/utils"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-// ArtistController handles artist-related routes
-type ArtistController struct {
-	db database.Service
-}
 
 // ArtistDTO is used for both create and update operations
 // Using pointers for fields allows us to distinguish between zero values and not provided values
@@ -41,15 +34,11 @@ func (dto *ArtistDTO) ToModel() models.Artist {
 }
 
 // Register routes for the artists module
-func RegisterArtistRoutes(r *gin.RouterGroup) {
-	controller := &ArtistController{
-		db: database.New(),
-	}
-
-	r.GET("", controller.listArtistsHandler)
-	r.POST("", controller.createArtistHandler)
-	r.DELETE("/:id", controller.deleteArtistHandler)
-	r.PATCH("/:id", controller.updateArtistHandler)
+func (s *Server) RegisterArtistAdminRoutes(r *gin.RouterGroup) {
+	r.GET("", s.listArtistsAdminHandler)
+	r.POST("", s.createArtistHandler)
+	r.DELETE("/:id", s.deleteArtistHandler)
+	r.PATCH("/:id", s.updateArtistHandler)
 }
 
 // @Summary List artists
@@ -61,12 +50,12 @@ func RegisterArtistRoutes(r *gin.RouterGroup) {
 // @Success 200 {array} models.Artist
 // @Router /admin/artists [get]
 // @Authorize Bearer
-func (b *ArtistController) listArtistsHandler(c *gin.Context) {
+func (s *Server) listArtistsAdminHandler(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
 	var artists []models.Artist
-	b.db.List(&artists, limit, offset)
+	s.db.List(&artists, limit, offset)
 
 	c.JSON(http.StatusOK, artists)
 }
@@ -81,7 +70,7 @@ func (b *ArtistController) listArtistsHandler(c *gin.Context) {
 // @Failure 400 {string} string
 // @Router /admin/artists [post]
 // @Authorize Bearer
-func (b *ArtistController) createArtistHandler(c *gin.Context) {
+func (s *Server) createArtistHandler(c *gin.Context) {
 	var inputDTO ArtistDTO
 	if err := c.ShouldBindJSON(&inputDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -90,7 +79,7 @@ func (b *ArtistController) createArtistHandler(c *gin.Context) {
 
 	artist := inputDTO.ToModel()
 
-	b.db.Create(&artist)
+	s.db.Create(&artist)
 	c.JSON(http.StatusCreated, artist)
 }
 
@@ -103,20 +92,20 @@ func (b *ArtistController) createArtistHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/artists/{id} [delete]
 // @Authorize Bearer
-func (b *ArtistController) deleteArtistHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) deleteArtistHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var artist models.Artist
-	if err := b.db.Read(&artist, uint(id)); err != nil {
+	if err := s.db.Read(&artist, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Artist not found"})
 		return
 	}
 
-	b.db.Delete(&artist, uint(id))
+	s.db.Delete(&artist, uint(id))
 	c.JSON(http.StatusNoContent, nil)
 }
 
@@ -132,15 +121,15 @@ func (b *ArtistController) deleteArtistHandler(c *gin.Context) {
 // @Failure 404 {string} string
 // @Router /admin/artists/{id} [patch]
 // @Authorize Bearer
-func (b *ArtistController) updateArtistHandler(c *gin.Context) {
-	id, err := utils.GetIDParam(c)
+func (s *Server) updateArtistHandler(c *gin.Context) {
+	id, err := GetIDParam(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var artist models.Artist
-	if err := b.db.Read(&artist, uint(id)); err != nil {
+	if err := s.db.Read(&artist, uint(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Artist not found"})
 		return
 	}
@@ -156,6 +145,6 @@ func (b *ArtistController) updateArtistHandler(c *gin.Context) {
 
 	updateDTO.ApplyToModel(&artist)
 
-	b.db.Update(&artist)
+	s.db.Update(&artist)
 	c.JSON(http.StatusOK, artist)
 }

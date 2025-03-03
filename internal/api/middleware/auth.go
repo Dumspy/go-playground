@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"go-playground/internal/server/utils"
+	"go-playground/internal/utils"
 	"strings"
 
 	"github.com/gin-gonic/gin"

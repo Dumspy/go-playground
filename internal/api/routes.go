@@ -1,11 +1,9 @@
-package server
+package api
 
 import (
+	"go-playground/internal/api/middleware"
+	"go-playground/internal/api/types"
 	"go-playground/internal/database/models"
-	"go-playground/internal/server/middleware"
-	"go-playground/internal/server/routes"
-	adminRoutes "go-playground/internal/server/routes/admin"
-	"go-playground/internal/server/types"
 	"go-playground/openapi"
 	"net/http"
 	"strconv"
@@ -14,7 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) RegisterRoutes() http.Handler {
+var APIv1 *gin.RouterGroup
+
+func (s *Server) StartServer() http.Handler {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -25,54 +25,49 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
-	r.GET("/health", s.healthHandler)
+	APIv1 = r.Group("/api/v1")
 
-	api := r.Group("/api/v1")
-	{
-		api.GET("/health", s.healthHandler)
-		authors := api.Group("/authors")
-		{
-			authors.GET("", s.listAuthorsHandler)
-			authors.GET("/:id", s.getAuthorHandler)
-		}
-
-		books := api.Group("/books")
-		{
-			books.GET("", s.listBooksHandler)
-			books.GET("/:id", s.getBookHandler)
-		}
-
-		artists := api.Group("/artists")
-		{
-			artists.GET("", s.ListArtistsHandler)
-			artists.GET("/:id", s.GetArtistHandler)
-		}
-
-		auth := api.Group("/auth")
-		{
-			routes.RegisterAuthRoutes(auth)
-		}
-
-		admin := api.Group("/admin")
-		admin.Use(middleware.AuthMiddleware())
-		{
-			adminBooks := admin.Group("/books")
-			adminRoutes.RegisterBookRoutes(adminBooks)
-
-			adminAuthors := admin.Group("/authors")
-			adminRoutes.RegisterAuthorRoutes(adminAuthors)
-
-			adminCovers := admin.Group("/covers")
-			adminRoutes.RegisterCoverRoutes(adminCovers)
-
-			adminArtists := admin.Group("/artists")
-			adminRoutes.RegisterArtistRoutes(adminArtists)
-		}
-	}
-
+	s.RegisterRoutes()
 	openapi.RegisterOpenApiRoute(r)
 
 	return r
+}
+
+func (s *Server) RegisterRoutes() {
+	APIv1.GET("/health", s.healthHandler)
+
+	APIv1 = APIv1.Group("/api/v1")
+
+	APIv1.GET("/health", s.healthHandler)
+	s.RegisterAdminRoutes(APIv1)
+
+	authors := APIv1.Group("/authors")
+	{
+		authors.GET("", s.listAuthorsHandler)
+		authors.GET("/:id", s.getAuthorHandler)
+	}
+
+	books := APIv1.Group("/books")
+	{
+		books.GET("", s.listBooksHandler)
+		books.GET("/:id", s.getBookHandler)
+	}
+
+	artists := APIv1.Group("/artists")
+	{
+		artists.GET("", s.ListArtistsHandler)
+		artists.GET("/:id", s.GetArtistHandler)
+	}
+
+	auth := APIv1.Group("/auth")
+	{
+		RegisterAuthRoutes(auth)
+	}
+
+	admin := APIv1.Group("/admin")
+	admin.Use(middleware.AuthMiddleware())
+	{
+	}
 }
 
 func (s *Server) healthHandler(c *gin.Context) {
