@@ -18,12 +18,23 @@ import {
 } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { useApi } from '@/context/api'
 
 export const Route = createFileRoute('/')({
   component: Index,
 })
 
 function Index() {
+  const { api } = useApi()
+
+  const {data, isLoading, error} = api.useQuery('get', '/books', {
+    params: {
+      query: {
+        limit: 6,
+      }
+    },
+  }) 
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
@@ -48,45 +59,63 @@ function Index() {
         <h2 className="text-3xl font-semibold text-center mb-8">Featured Titles</h2>
         <Carousel className="w-full max-w-5xl mx-auto">
           <CarouselContent>
-            {[1, 2, 3, 4, 5].map((book) => (
-              <CarouselItem key={book} className="md:basis-1/3 lg:basis-1/3">
-                <Card>
-                  <CardHeader className="p-0">
-                    <div className="aspect-[2/3] bg-slate-200 rounded-t-md"></div>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <CardTitle className="text-lg">Book Title {book}</CardTitle>
-                    <CardDescription>Author Name</CardDescription>
+            {isLoading ? (
+              // Loading skeleton cards
+              [1, 2, 3, 4, 5].map((item) => (
+                <CarouselItem key={`skeleton-${item}`} className="md:basis-1/3 lg:basis-1/3">
+                  <Card>
+                    <CardHeader className="p-0">
+                      <div className="aspect-[2/3] bg-slate-200 rounded-t-md animate-pulse"></div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <div className="h-5 bg-slate-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-slate-200 rounded w-1/2 animate-pulse"></div>
+                    </CardContent>
+                    <CardFooter>
+                      <div className="h-9 bg-slate-200 rounded w-full animate-pulse"></div>
+                    </CardFooter>
+                  </Card>
+                </CarouselItem>
+              ))
+            ) : error ? (
+              <CarouselItem className="basis-full">
+                <Card className="border-red-200">
+                  <CardContent className="pt-6 text-center text-red-500">
+                    <p>Failed to load books. Please try again later.</p>
                   </CardContent>
-                  <CardFooter>
-                    <Button variant="secondary" className="w-full">View Details</Button>
-                  </CardFooter>
                 </Card>
               </CarouselItem>
-            ))}
+            ) : (
+              // Display actual books data
+              data?.map((book, index) => (
+                <CarouselItem key={book.id || index} className="md:basis-1/3 lg:basis-1/3">
+                  <Card>
+                    <CardHeader className="p-0">
+                      <div className="aspect-[2/3] bg-slate-200 rounded-t-md">
+                        <img 
+                          src={book.Cover?.image_url || 'https://placehold.co/300x450?text=No+Cover'}
+                          alt={book.title} 
+                          className="w-full h-full object-cover rounded-t-md"
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <CardTitle className="text-lg">{book.title}</CardTitle>
+                      <CardDescription>{book.author_id}</CardDescription>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="secondary" className="w-full">View Details</Button>
+                    </CardFooter>
+                  </Card>
+                </CarouselItem>
+              ))
+            )}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
         </Carousel>
       </section>
-      
-      {/* Book Categories */}
-      <section className="py-12 my-8">
-        <h2 className="text-3xl font-semibold text-center mb-8">Browse by Genre</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {['Fiction', 'Non-Fiction', 'Poetry', 'Children\'s'].map((genre) => (
-            <Card key={genre} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-center">{genre}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button variant="ghost">Explore</Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-      
+            
       <Separator className="my-8" />
       
       {/* About Publisher */}
