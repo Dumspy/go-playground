@@ -24,6 +24,7 @@ type BookDTO struct {
 	PublishedDate *time.Time `json:"published_date" binding:"required_without=ID"`
 	Pages         *uint      `json:"pages" binding:"required_without=ID"`
 	Description   *string    `json:"description" binding:"required_without=ID"`
+	DigitalOnly   *bool      `json:"digital_only" binding:"required_without=ID"`
 	ISBN          *string    `json:"isbn" binding:"required_without=ID"`
 	Price         *float32   `json:"price" binding:"required_without=ID"`
 	AuthorID      *uint      `json:"author_id" binding:"required_without=ID"`
@@ -48,6 +49,9 @@ func (dto *BookDTO) ApplyToModel(book *models.Book) {
 	}
 	if dto.Price != nil {
 		book.Price = *dto.Price
+	}
+	if dto.DigitalOnly != nil {
+		book.DigitalOnly = *dto.DigitalOnly
 	}
 	if dto.AuthorID != nil {
 		book.AuthorID = *dto.AuthorID
