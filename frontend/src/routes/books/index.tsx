@@ -7,10 +7,10 @@ export const Route = createFileRoute('/books/')({
 })
 
 function RouteComponent() {
-  const {api} = useApi()
+  const { api } = useApi()
 
-  const {data, isLoading, error} = api.useQuery('get', '/books')
-  
+  const { data, isLoading, error } = api.useQuery('get', '/books')
+
   // Ensure data is an array even if the response is undefined
   const books = Array.isArray(data) ? data : [];
 

@@ -4,7 +4,7 @@ import type { paths } from "@/types/shared-types";
 import type { Middleware } from "openapi-fetch";
 
 function authMiddleware(getToken: () => string | null): Middleware {
-  return{
+  return {
     async onRequest({ schemaPath, request }) {
       // Only add the token to requests to the /admin path
       if (!schemaPath.startsWith("/admin")) {

@@ -318,7 +318,7 @@ const AuthorsTab: React.FC = () => {
       </div>
 
       {/* Create/Edit Dialog */}
-      <AuthorForm variant={formVariant} author={selectedAuthor} onSubmit={formVariant === "create" ? handleCreate : handleUpdate} isOpen={isFormDialogOpen} setIsOpen={setIsFormDialogOpen}/>
+      <AuthorForm variant={formVariant} author={selectedAuthor} onSubmit={formVariant === "create" ? handleCreate : handleUpdate} isOpen={isFormDialogOpen} setIsOpen={setIsFormDialogOpen} />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

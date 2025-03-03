@@ -59,6 +59,7 @@
 
     --radius: 0.5rem
   }
+
   .dark {
 
     --background: 240 10% 3.9%;
@@ -117,6 +118,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

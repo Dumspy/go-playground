@@ -117,7 +117,7 @@ function RouteComponent() {
                     </span>
                   </div>
                 )}
-                
+
                 {book.isbn && (
                   <div>
                     <span className="text-muted-foreground">ISBN:</span>{' '}

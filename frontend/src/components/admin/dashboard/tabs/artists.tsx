@@ -343,30 +343,30 @@ const ArtistsTab: React.FC = () => {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleCreate)} className="grid gap-4 py-4">
-                <FormField control={form.control} name="first_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="first_name">First Name</FormLabel>
-                    <FormControl>
-                      <Input id="first_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the artist's first name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="last_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="last_name">Last name</FormLabel>
-                    <FormControl>
-                      <Input id="last_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the artist's last name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              <FormField control={form.control} name="first_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="first_name">First Name</FormLabel>
+                  <FormControl>
+                    <Input id="first_name" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please enter the artist's first name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="last_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="last_name">Last name</FormLabel>
+                  <FormControl>
+                    <Input id="last_name" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please enter the artist's last name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
               <DialogFooter>
                 <Button type="submit">Create</Button>
               </DialogFooter>
@@ -386,30 +386,30 @@ const ArtistsTab: React.FC = () => {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleUpdate)} className="grid gap-4 py-4">
-                <FormField control={form.control} name="first_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="first_name">First Name</FormLabel>
-                    <FormControl>
-                      <Input id="first_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the artist's first name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="last_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="last_name">Last name</FormLabel>
-                    <FormControl>
-                      <Input id="last_name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Please enter the artist's last name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              <FormField control={form.control} name="first_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="first_name">First Name</FormLabel>
+                  <FormControl>
+                    <Input id="first_name" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please enter the artist's first name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="last_name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="last_name">Last name</FormLabel>
+                  <FormControl>
+                    <Input id="last_name" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please enter the artist's last name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )} />
               <DialogFooter>
                 <Button type="submit">Update</Button>
               </DialogFooter>

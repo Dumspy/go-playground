@@ -7,10 +7,10 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 export const Route = createRootRoute({
   component: () => (
     <>
-      <NavHeader/>
+      <NavHeader />
       <Outlet />
-      <Toaster theme='light'/>
-      
+      <Toaster theme='light' />
+
       {import.meta.env.DEV && (
         <>
           <TanStackRouterDevtools />

@@ -37,7 +37,7 @@ interface AuthorFormProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
-const AuthorForm: React.FC<AuthorFormProps> =({ variant, author, onSubmit, isOpen, setIsOpen }) => {
+const AuthorForm: React.FC<AuthorFormProps> = ({ variant, author, onSubmit, isOpen, setIsOpen }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,7 +73,7 @@ const AuthorForm: React.FC<AuthorFormProps> =({ variant, author, onSubmit, isOpe
       form.reset();
     }
   }
-  , [isOpen, form]);
+    , [isOpen, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

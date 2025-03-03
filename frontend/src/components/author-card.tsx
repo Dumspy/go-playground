@@ -33,8 +33,8 @@ export default function AuthorCard({ author }: AuthorCardProps) {
       </CardContent>
       <CardFooter>
         {author?.id ? (
-          <Link 
-            to="/authors/$authorId" 
+          <Link
+            to="/authors/$authorId"
             params={{ authorId: author.id.toString() }}
             className={buttonVariants({ variant: "outline" })}
           >

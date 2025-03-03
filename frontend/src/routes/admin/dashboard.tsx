@@ -36,11 +36,11 @@ function RouteComponent() {
       replace: true,
     })
   }
-  
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      
+
       <Tabs value={category} onValueChange={handleTabChange} className="w-full">
         <TabsList className="mb-4">
           {tabDefinitions.map(tab => (
@@ -49,7 +49,7 @@ function RouteComponent() {
             </TabsTrigger>
           ))}
         </TabsList>
-        
+
         {tabDefinitions.map(tab => {
           const TabComponent = tab.component
           return (

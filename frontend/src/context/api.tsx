@@ -16,7 +16,7 @@ export function ApiContextProvider({ children }: { children: React.ReactNode }) 
   const { getToken } = useAuth()
 
   const tanClient = useQueryClient()
-  
+
   const api = React.useMemo(() => {
     const fetchClient = createApiClient(getToken)
     return createClient(fetchClient)

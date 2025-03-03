@@ -25,7 +25,7 @@ export default function BookCard({ book }: BookCardProps) {
         <CardHeader className="p-0">
           <div className="aspect-[2/3] w-full overflow-hidden relative">
             <img
-              src={book.Cover?.image_url|| defaultCoverUrl}
+              src={book.Cover?.image_url || defaultCoverUrl}
               alt={`Cover of ${book.title}`}
               className="w-full h-full object-cover"
               onError={(e) => {

@@ -309,7 +309,7 @@ const BooksTab: React.FC = () => {
   };
 
   if (isLoading) {
-    return <TableLoading title="Book" columnCount={8} hasActions/>
+    return <TableLoading title="Book" columnCount={8} hasActions />
   }
 
   if (isError) {
@@ -449,7 +449,7 @@ const BooksTab: React.FC = () => {
                       </PopoverContent>
                     </Popover>
                     <FormDescription>
-                       Select the date the book was published 
+                      Select the date the book was published
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -596,7 +596,7 @@ const BooksTab: React.FC = () => {
                       </PopoverContent>
                     </Popover>
                     <FormDescription>
-                       Select the date the book was published 
+                      Select the date the book was published
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

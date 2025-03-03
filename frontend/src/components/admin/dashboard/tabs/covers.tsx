@@ -117,7 +117,7 @@ const CoversTab: React.FC = () => {
   } = api.useQuery('get', "/admin/books");
 
   const {
-     data: artists = [],
+    data: artists = [],
   } = api.useQuery('get', "/admin/artists");
 
 
@@ -457,7 +457,7 @@ const CoversTab: React.FC = () => {
                             !field.value.length && "text-muted-foreground"
                           )}
                         >
-                          {field.value.length > 0 
+                          {field.value.length > 0
                             ? `${field.value.length} artist${field.value.length > 1 ? "s" : ""} selected`
                             : "Select artists"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -588,7 +588,7 @@ const CoversTab: React.FC = () => {
                             !field.value.length && "text-muted-foreground"
                           )}
                         >
-                          {field.value.length > 0 
+                          {field.value.length > 0
                             ? `${field.value.length} artist${field.value.length > 1 ? "s" : ""} selected`
                             : "Select artists"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

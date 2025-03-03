@@ -1,12 +1,12 @@
 import { Link, useRouter } from "@tanstack/react-router"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { 
-  Sheet, 
-  SheetTrigger, 
+import {
+  Sheet,
+  SheetTrigger,
   SheetContent,
   SheetTitle,
   SheetHeader,
-  SheetDescription 
+  SheetDescription
 } from "@/components/ui/sheet"
 import {
   NavigationMenu,
@@ -36,7 +36,7 @@ const items = {
 export default function NavHeader() {
   const { logout, isAuthenticated } = useAuth()
   const { navigate } = useRouter()
-  
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:border-gray-800 dark:bg-gray-950">
       <div className="container mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
@@ -47,7 +47,7 @@ export default function NavHeader() {
             <span className="sr-only">Company logo</span>
           </Link>
         </div>
-        
+
         {/* Middle section - Navigation */}
         <div className="flex-grow">
           <NavigationMenu className="hidden md:flex">
@@ -64,42 +64,42 @@ export default function NavHeader() {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        
+
         {/* Right section - Login button and mobile menu */}
         <div className="flex items-center gap-2">
           {/* Login Button */}
-          { isAuthenticated ? (
+          {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
                 to="/admin/dashboard"
                 className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
+              >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">Dashboard</span>
               </Link>
-              <Button 
+              <Button
                 onClick={() => {
                   logout()
                   navigate({ to: '/' })
                 }}
                 variant={"outline"}
                 size={"sm"}
-                >
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">Logout</span>
               </Button>
             </div>
           ) : (
 
-              <Link
+            <Link
               to="/auth/login"
               className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
+            >
               <LogIn className="mr-2 h-4 w-4" />
               <span className="hidden md:inline">Login</span>
             </Link>
           )}
-          
+
           {/* Mobile Navigation */}
           <Sheet>
             <SheetTrigger asChild>
@@ -123,7 +123,7 @@ export default function NavHeader() {
                     className="text-base font-medium transition-colors hover:text-primary"
                   >
                     {item.title}
-                  </Link> 
+                  </Link>
                 ))}
               </nav>
             </SheetContent>
