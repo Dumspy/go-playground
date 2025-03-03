@@ -52,5 +52,10 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	if !token.Valid {
 		return nil, errors.New("invalid token")
 	}
+
+	if claims.ExpiresAt.Time.Before(time.Now()) {
+		return nil, errors.New("token expired")
+	}
+
 	return claims, nil
 }
