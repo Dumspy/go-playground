@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { fullName } from '@/lib/utils'
 
 export const Route = createFileRoute('/books/$bookId')({
   component: RouteComponent,
@@ -96,12 +97,12 @@ function RouteComponent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
                 <div>
                   <span className="text-muted-foreground">Author:</span>{' '}
-                  <span className="font-medium">{book.AuthorID || 'Unknown'}</span>
+                  <span className="font-medium">{fullName(book.author?.first_name, book.author?.last_name)}</span>
                 </div>
 
                 <div>
                   <span className="text-muted-foreground">Artist:</span>{' '}
-                  <span className="font-medium">{book.AuthorID || 'Unknown'}</span>
+                  <span className="font-medium">{'Artist tbd'}</span> {/* TODO */}
                 </div>
 
                 {book.published_date && (

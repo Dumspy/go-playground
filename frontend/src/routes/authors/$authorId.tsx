@@ -7,6 +7,7 @@ import React from 'react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { fullName } from '@/lib/utils'
 
 export const Route = createFileRoute('/authors/$authorId')({
   component: AuthorComponent,
@@ -21,16 +22,6 @@ function AuthorComponent() {
       path: { id: Number(authorId) },
     },
   })
-
-  // Move useMemo here, before any conditional returns
-  const fullName = React.useMemo(() => {
-    // Handle case where author might be undefined
-    if (!author) return "Unknown Author";
-
-    return [author.first_name, author.last_name]
-      .filter(Boolean)
-      .join(' ') || "Unknown Author";
-  }, [author]);
 
   if (isLoading) {
     return (
@@ -85,7 +76,7 @@ function AuthorComponent() {
       
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">{fullName}</CardTitle>
+          <CardTitle className="text-2xl">{fullName(author.first_name, author.last_name)}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">

@@ -17,5 +17,6 @@ type Book struct {
 	Price         float32   `json:"price" binding:"required"`
 	Genres        []*Genre  `json:"genres" gorm:"many2many:book_genres;"`
 	Cover         Cover
-	AuthorID      uint
+	AuthorID      uint   `json:"author_id"`
+	Author        Author `json:"author" gorm:"foreignKey:AuthorID"`
 }

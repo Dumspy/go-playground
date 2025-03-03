@@ -205,7 +205,7 @@ func (s *Server) listBooksHandler(c *gin.Context) {
 			Title:         book.Title,
 			DigitalOnly:   book.DigitalOnly,
 			PublishedDate: book.PublishedDate.Format("2006-01-02"),
-			AuthorID:      book.AuthorID,
+			Author:        types.ListAuthorResponse{ID: book.Author.ID, FirstName: book.Author.FirstName, LastName: book.Author.LastName},
 			Cover:         types.ListCoverResponse{ID: book.Cover.ID, ImageURL: book.Cover.ImageURL.String},
 		})
 	}

@@ -11,22 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { fullName } from "@/lib/utils";
 
 interface AuthorCardProps {
   author: components["schemas"]["go-playground_internal_server_types.ListAuthorResponse"]
 }
 
 export default function AuthorCard({ author }: AuthorCardProps) {
-  const fullName = [author?.first_name, author?.last_name]
-    .filter(Boolean)
-    .join(' ') || "Unknown Author";
-
   return (
     <Card className="w-[350px]">
       <CardHeader className="flex items-center justify-between">
         <Skeleton className="rounded-full w-16 h-16 mb-4" />
         <div className="mr-4 flex-1">
-          <CardTitle>{fullName}</CardTitle>
+          <CardTitle>{fullName(author.first_name, author.last_name)}</CardTitle>
           <CardDescription>Lorem ipsum dolor sit amet.</CardDescription>
         </div>
       </CardHeader>

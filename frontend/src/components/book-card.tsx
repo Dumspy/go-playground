@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
 } from "@/components/ui/card"
+import { fullName } from '@/lib/utils'
 
 interface BookCardProps {
   book: components["schemas"]["go-playground_internal_server_types.ListBookResponse"]
@@ -40,8 +41,8 @@ export default function BookCard({ book }: BookCardProps) {
         </CardHeader>
         <CardContent className="p-4">
           <h3 className="font-medium text-lg line-clamp-2">{book.title}</h3>
-          {book.author_id && (
-            <p className="text-sm text-gray-600 mt-1">by {book.author_id}</p>
+          {book.Author && (
+            <p className="text-sm text-gray-600 mt-1">by {fullName(book.Author.first_name, book.Author.last_name)}</p>
           )}
         </CardContent>
       </Card>

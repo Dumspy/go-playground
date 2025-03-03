@@ -233,7 +233,7 @@ func (s *service) GetAuthor(id uint) (*models.Author, error) {
 
 func (s *service) ListBooks(limit int, offset int) ([]models.Book, error) {
 	var books []models.Book
-	if err := s.db.Preload("Cover").Limit(limit).Offset(offset).Find(&books).Error; err != nil {
+	if err := s.db.Preload("Cover").Preload("Author").Limit(limit).Offset(offset).Find(&books).Error; err != nil {
 		return nil, err
 	}
 	return books, nil

@@ -764,12 +764,13 @@ export interface components {
             last_name: string;
         };
         "go-playground_internal_database_models.Book": {
-            AuthorID?: number;
             Cover?: components["schemas"]["go-playground_internal_database_models.Cover"];
             CreatedAt?: string;
             DeletedAt?: components["schemas"]["gorm.DeletedAt"];
             ID?: number;
             UpdatedAt?: string;
+            author?: components["schemas"]["go-playground_internal_database_models.Author"];
+            author_id?: number;
             description: string;
             digital_only: boolean;
             genres?: components["schemas"]["go-playground_internal_database_models.Genre"][];
@@ -803,8 +804,8 @@ export interface components {
             last_name?: string;
         };
         "go-playground_internal_server_types.ListBookResponse": {
+            Author?: components["schemas"]["go-playground_internal_server_types.ListAuthorResponse"];
             Cover?: components["schemas"]["go-playground_internal_server_types.ListCoverResponse"];
-            author_id?: number;
             description?: string;
             digital_only?: boolean;
             genres?: string[];

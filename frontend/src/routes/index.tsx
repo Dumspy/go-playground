@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useApi } from '@/context/api'
+import { fullName } from '@/lib/utils'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -87,7 +88,7 @@ function Index() {
               </CarouselItem>
             ) : (
               // Display actual books data
-              data?.map((book, index) => (
+              data?.map((book, index) => ( 
                 <CarouselItem key={book.id || index} className="md:basis-1/3 lg:basis-1/3">
                   <Card>
                     <CardHeader className="p-0">
@@ -101,7 +102,7 @@ function Index() {
                     </CardHeader>
                     <CardContent className="pt-4">
                       <CardTitle className="text-lg">{book.title}</CardTitle>
-                      <CardDescription>{book.author_id}</CardDescription>
+                      <CardDescription>{fullName(book.Author?.first_name, book.Author?.last_name)}</CardDescription>
                     </CardContent>
                     <CardFooter>
                       <Button variant="secondary" className="w-full">View Details</Button>

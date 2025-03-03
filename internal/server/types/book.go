@@ -11,6 +11,6 @@ type ListBookResponse struct {
 	ISBN          string   `json:"isbn"`
 	Price         float32  `json:"price"`
 	Genres        []string `json:"genres"`
-	AuthorID      uint     `json:"author_id"`
+	Author        ListAuthorResponse
 	Cover         ListCoverResponse
 }
