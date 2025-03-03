@@ -1,7 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useApi } from '@/context/api'
-import { Link } from '@tanstack/react-router'
-import { buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -13,6 +12,7 @@ export const Route = createFileRoute('/books/$bookId')({
 })
 
 function RouteComponent() {
+  const { history } = useRouter()
   const { bookId } = Route.useParams()
   const { api } = useApi()
 
@@ -35,9 +35,9 @@ function RouteComponent() {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="pt-6 flex flex-col items-center">
           <p className="text-destructive">Error loading book details</p>
-          <Link to="/books" className={buttonVariants({ variant: "link", className: "mt-4" })}>
-            Back to books
-          </Link>
+          <Button onClick={() => history.back} variant="link" className="mt-4">
+            Back
+          </Button>
         </CardContent>
       </Card>
     )
@@ -48,9 +48,9 @@ function RouteComponent() {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="pt-6 flex flex-col items-center">
           <p className="text-muted-foreground">Book not found</p>
-          <Link to="/books" className={buttonVariants({ variant: "link", className: "mt-4" })}>
-            Back to books
-          </Link>
+          <Button onClick={() => history.back} variant="link" className="mt-4">
+            Back
+          </Button>
         </CardContent>
       </Card>
     )
@@ -58,9 +58,9 @@ function RouteComponent() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <Link to="/books" className={buttonVariants({ variant: "link", className: "pl-0 mb-6" })}>
-        &larr; Back to all books
-      </Link>
+      <Button variant="link" className="pl-0 mb-6" onClick={() => history.back()}>
+        &larr; Back
+      </Button>
 
       <Card className="overflow-hidden">
         <div className="md:flex">

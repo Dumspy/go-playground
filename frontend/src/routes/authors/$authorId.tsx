@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApi } from '@/context/api'
-import React from 'react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -14,6 +13,7 @@ export const Route = createFileRoute('/authors/$authorId')({
 })
 
 function AuthorComponent() {
+  const { history } = useRouter()
   const { authorId } = Route.useParams()
   const { api } = useApi()
 
@@ -72,8 +72,10 @@ function AuthorComponent() {
 
   return (
     <div className="p-4 space-y-4">
-      <Link to="/authors" className={buttonVariants({ variant: "outline", className: "pl-0 mb-2"})}>&larr; Back to all authors</Link>
-      
+      <Button variant="link" className="pl-0 mb-2" onClick={() => history.back()}>
+        &larr; Back
+      </Button>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">{fullName(author.first_name, author.last_name)}</CardTitle>
