@@ -240,7 +240,7 @@ const BooksTab: React.FC = () => {
                   form.setValue("description", book.description);
                   form.setValue("isbn", book.isbn);
                   form.setValue("price", book.price);
-                  form.setValue("author_id", book.AuthorID || 0);
+                  form.setValue("author_id", book.author_id || 0);
                   setIsEditDialogOpen(true);
                 }}
               >
