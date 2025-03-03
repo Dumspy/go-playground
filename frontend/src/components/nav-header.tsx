@@ -31,10 +31,6 @@ const items = {
     title: 'Books',
     href: '/books',
   },
-  about: {
-    title: 'About',
-    href: '/about',
-  },
 }
 
 export default function NavHeader() {
