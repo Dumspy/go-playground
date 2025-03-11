@@ -41,8 +41,11 @@ type Service interface {
 	GetArtist(id uint) (*models.Artist, error)
 
 	GetUser(username string) (*models.User, error)
+	GetUserByRefreshToken(token string) (*models.User, error)
 
 	ListCovers(limit int, offset int) ([]models.Cover, error)
+
+	ClearRefreshToken(token string) error
 }
 
 type service struct {
@@ -273,4 +276,25 @@ func (s *service) GetArtist(id uint) (*models.Artist, error) {
 		return nil, err
 	}
 	return &artist, nil
+}
+
+func (s *service) GetUserByRefreshToken(token string) (*models.User, error) {
+	var user models.User
+	if err := s.db.Where("refresh_token = ?", token).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *service) ClearRefreshToken(token string) error {
+	var user models.User
+	if err := s.db.Where("refresh_token = ?", token).First(&user).Error; err != nil {
+		return err
+	}
+
+	user.RefreshToken = ""
+	if err := s.db.Save(&user).Error; err != nil {
+		return err
+	}
+	return nil
 }

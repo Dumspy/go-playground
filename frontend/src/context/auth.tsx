@@ -6,13 +6,14 @@ interface AuthContextValue {
   login: (username: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   getToken: () => string | null
+  setToken: (token: string) => void
 }
 
 export const ApiContext = React.createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
-  const [token, setToken] = React.useState<string | null>(null)
+  const [token, setTokenState] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     const storedToken = localStorage.getItem("authToken")
@@ -23,10 +24,14 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   }, [])
 
   const getToken = React.useCallback(() => token, [token])
+  const setToken = React.useCallback((token: string) => {
+    setTokenState(token)
+    localStorage.setItem("authToken", token)
+  }, [])
 
   const login = async (username: string, password: string) => {
     try {
-      const client = createApiClient(() => token)
+      const client = createApiClient(() => token, (token: string) => setToken(token))
       const response = await client.POST("/auth/login", {
         body: {
           username,
@@ -35,7 +40,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       })
 
       if (response.data?.authToken) {
-        setToken(response.data.authToken)
+        setTokenState(response.data.authToken)
         setIsAuthenticated(true)
         localStorage.setItem("authToken", response.data.authToken)
         return true
@@ -50,12 +55,12 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
   const logout = async () => {
     try {
-      const client = createApiClient(() => token)
+      const client = createApiClient(() => token, (token: string) => setToken(token))
       await client.POST("/auth/logout")
     } catch (error) {
       console.error("Logout failed", error)
     } finally {
-      setToken(null)
+      setTokenState(null)
       setIsAuthenticated(false)
       localStorage.removeItem("authToken")
     }
@@ -67,7 +72,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       isAuthenticated,
       login,
       logout,
-      getToken
+      getToken,
+      setToken
     }}>
       {children}
     </ApiContext.Provider>

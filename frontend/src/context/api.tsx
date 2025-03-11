@@ -13,12 +13,12 @@ interface ApiContextValue {
 export const ApiContext = React.createContext<ApiContextValue | undefined>(undefined)
 
 export function ApiContextProvider({ children }: { children: React.ReactNode }) {
-  const { getToken } = useAuth()
+  const { getToken, setToken } = useAuth()
 
   const tanClient = useQueryClient()
 
   const api = React.useMemo(() => {
-    const fetchClient = createApiClient(getToken)
+    const fetchClient = createApiClient(getToken, setToken)
     return createClient(fetchClient)
   }, [getToken])
 

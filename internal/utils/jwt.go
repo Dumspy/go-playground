@@ -24,7 +24,7 @@ func GenerateJWT(user models.User) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "go-playground",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 3)),
 		},
 	}
 
