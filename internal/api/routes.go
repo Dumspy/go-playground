@@ -36,8 +36,6 @@ func (s *Server) StartServer() http.Handler {
 func (s *Server) RegisterRoutes() {
 	APIv1.GET("/health", s.healthHandler)
 
-	APIv1 = APIv1.Group("/api/v1")
-
 	APIv1.GET("/health", s.healthHandler)
 	s.RegisterAdminRoutes(APIv1)
 

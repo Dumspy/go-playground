@@ -17,7 +17,7 @@ import (
 	"syscall"
 	"time"
 
-	"go-playground/internal/server"
+	"go-playground/internal/api"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -46,7 +46,7 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 
 func main() {
 
-	server := server.NewServer()
+	server := api.NewServer()
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
