@@ -35,10 +35,13 @@ func (dto *ArtistDTO) ToModel() models.Artist {
 
 // Register routes for the artists module
 func (s *Server) RegisterArtistAdminRoutes(r *gin.RouterGroup) {
-	r.GET("", s.listArtistsAdminHandler)
-	r.POST("", s.createArtistHandler)
-	r.DELETE("/:id", s.deleteArtistHandler)
-	r.PATCH("/:id", s.updateArtistHandler)
+	artists := r.Group("/artists")
+	{
+		artists.GET("", s.listArtistsAdminHandler)
+		artists.POST("", s.createArtistHandler)
+		artists.DELETE("/:id", s.deleteArtistHandler)
+		artists.PATCH("/:id", s.updateArtistHandler)
+	}
 }
 
 // @Summary List artists

@@ -60,10 +60,13 @@ func (dto *BookDTO) ToModel() models.Book {
 
 // Register routes for the books module
 func (s *Server) RegisterBooksAdminRoutes(r *gin.RouterGroup) {
-	r.GET("", s.listBooksAdminHandler)
-	r.POST("", s.createBookHandler)
-	r.DELETE("/:id", s.deleteBookHandler)
-	r.PATCH("/:id", s.updateBookHandler)
+	books := r.Group("/books")
+	{
+		books.GET("", s.listBooksAdminHandler)
+		books.POST("", s.createBookHandler)
+		books.DELETE("/:id", s.deleteBookHandler)
+		books.PATCH("/:id", s.updateBookHandler)
+	}
 }
 
 // @Summary List books

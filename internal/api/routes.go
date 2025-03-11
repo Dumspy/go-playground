@@ -1,7 +1,6 @@
 package api
 
 import (
-	"go-playground/internal/api/middleware"
 	"go-playground/internal/api/types"
 	"go-playground/internal/database/models"
 	"go-playground/openapi"
@@ -36,7 +35,6 @@ func (s *Server) StartServer() http.Handler {
 func (s *Server) RegisterRoutes() {
 	APIv1.GET("/health", s.healthHandler)
 
-	APIv1.GET("/health", s.healthHandler)
 	s.RegisterAdminRoutes(APIv1)
 
 	authors := APIv1.Group("/authors")
@@ -60,11 +58,6 @@ func (s *Server) RegisterRoutes() {
 	auth := APIv1.Group("/auth")
 	{
 		RegisterAuthRoutes(auth)
-	}
-
-	admin := APIv1.Group("/admin")
-	admin.Use(middleware.AuthMiddleware())
-	{
 	}
 }
 

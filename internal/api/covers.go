@@ -44,10 +44,13 @@ func (dto *CoverDTO) ToModel() models.Cover {
 
 // Register routes for the books module
 func (s *Server) RegisterCoversAdminRoutes(r *gin.RouterGroup) {
-	r.GET("", s.listCoversHandler)
-	r.POST("", s.createCoverHandler)
-	r.DELETE("/:id", s.deleteCoverHandler)
-	r.PATCH("/:id", s.updateCoverHandler)
+	covers := r.Group("/covers")
+	{
+		covers.GET("", s.listCoversHandler)
+		covers.POST("", s.createCoverHandler)
+		covers.DELETE("/:id", s.deleteCoverHandler)
+		covers.PATCH("/:id", s.updateCoverHandler)
+	}
 }
 
 // @Summary List covers

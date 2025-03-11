@@ -35,10 +35,13 @@ func (dto *AuthorDTO) ToModel() models.Author {
 
 // Register routes for the authors module
 func (s *Server) RegisterAuthorAdminRoutes(r *gin.RouterGroup) {
-	r.GET("", s.listAuthorsAdminHandler)
-	r.POST("", s.createAuthorHandler)
-	r.DELETE("/:id", s.deleteAuthorHandler)
-	r.PATCH("/:id", s.updateAuthorHandler)
+	authors := r.Group("/authors")
+	{
+		authors.GET("", s.listAuthorsAdminHandler)
+		authors.POST("", s.createAuthorHandler)
+		authors.DELETE("/:id", s.deleteAuthorHandler)
+		authors.PATCH("/:id", s.updateAuthorHandler)
+	}
 }
 
 // @Summary List authors
